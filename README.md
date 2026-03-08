@@ -92,7 +92,18 @@ npm run dev
    npm run build
    ```
 4. Serve the contents of `frontend/dist` using Nginx/Apache or similar.
-5. Deploy the backend with `gunicorn` (or equivalent production ASGI server) with `uvicorn` workers.
+### Deployment (Render / Linux)
+
+For production deployment on platforms like Render, we use a Linux shell script to automate the setup.
+
+1.  **Configure Environment**: Set your backend environment variables (`SECRET_KEY`, `PROD=True`, `ALLOWED_ORIGINS`).
+2.  **Persistent Disk (CRITICAL)**: Because SQLite uses a local file, Render's default ephemeral disk will clear your database on every restart. 
+    -   In the Render Dashboard, go to **Disks**.
+    -   Create a disk (e.g., `draft-db`, 1GB).
+    -   Mount it to `/opt/render/project/src/backend/data`.
+    -   Update your `.env` to use: `DATABASE_URL=sqlite:////opt/render/project/src/backend/data/genshin_draft.db`.
+3.  **Start Command**: Use `./entrypoint.sh` as the Start Command. This script automatically runs migrations, seeds data if needed, and starts the server.
 
 ## License
 MIT License
+
