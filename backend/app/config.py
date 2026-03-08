@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     DATABASE_URL: str = f"sqlite:///{BASE_DIR / 'genshin_draft.db'}"
     APP_ENV: str = "development"
     PROD: bool = False
+    ALLOWED_ORIGINS: list[str] = ["*"]
 
 
 settings = Settings()

@@ -35,17 +35,25 @@ export function useWebSocket(roomCode, role) {
 
         // Read WS URL from env, or fallback to dev localhost matching current protocol/host
         const isProd = import.meta.env.PROD;
-        const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-
+        let wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
         let basePath = import.meta.env.VITE_WS_URL;
+
         if (!basePath) {
-            basePath = isProd ? window.location.host : 'localhost:8000';
+            const apiUrl = import.meta.env.VITE_API_URL;
+            if (apiUrl) {
+                // Derive from API URL: https://api.com -> api.com
+                basePath = apiUrl.replace(/^https?:\/\//, '').replace(/\/+$/, '');
+                if (apiUrl.startsWith('https://')) wsProtocol = 'wss:';
+            } else {
+                basePath = isProd ? window.location.host : 'localhost:8000';
+            }
         }
 
         // Remove trailing slash if present
         basePath = basePath.replace(/\/+$/, '');
 
         const wsUrl = `${wsProtocol}//${basePath}/ws/${roomCode}?token=${token}&role=${role}`
+        console.log(`[WS] Attempting connection to: ${wsUrl}`)
 
         const ws = new WebSocket(wsUrl)
         wsRef.current = ws
