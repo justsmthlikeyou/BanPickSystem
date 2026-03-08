@@ -1,8 +1,10 @@
 import axios from 'axios'
 
-// Base axios instance. Vite proxy forwards /api → http://localhost:8000
+// Base axios instance. Vite proxy forwards /api → http://localhost:8000 in dev
+// In production, uses the absolute VITE_API_URL.
+const API_BASE_URL = import.meta.env.VITE_API_URL || '';
 const api = axios.create({
-    baseURL: '/api/v1',
+    baseURL: API_BASE_URL ? `${API_BASE_URL}/api/v1` : '/api/v1',
     headers: { 'Content-Type': 'application/json' },
 })
 
