@@ -39,11 +39,8 @@ router = APIRouter()
 
 ALGORITHM = "HS256"
 
-# ── In-memory pass tracking ───────────────────────────────────────────────────
-_swap_passes: dict[int, set[str]] = defaultdict(set)
-
-# ── In-memory pause state ─────────────────────────────────────────────────────
-_paused_rooms: set[str] = set()
+# ── Persistence (for server restarts/reconnects) ──────────────────────────
+# DEPRECATED: Now stored in DraftSession (is_paused, player_a_passed, player_b_passed)
 
 
 # ── Helpers ───────────────────────────────────────────────────────────────────
@@ -80,6 +77,9 @@ def _build_snapshot(session: DraftSession, db: Session) -> dict:
         "toss_winner_choice": session.toss_winner_choice,
         "first_pick_player": session.first_pick_player,
         "first_half_player": session.first_half_player,
+        "is_paused": session.is_paused,
+        "player_a_passed": session.player_a_passed,
+        "player_b_passed": session.player_b_passed,
         "draft_actions": [
             {
                 "sequence_num": a.sequence_num,
@@ -299,7 +299,7 @@ async def websocket_endpoint(
 
                 # ── SUBMIT_DRAFT_ACTION ───────────────────────────────────────────
                 elif event == "SUBMIT_DRAFT_ACTION":
-                    if room_code in _paused_rooms:
+                    if session.is_paused:
                         await _err(ws, "Draft is paused by admin.")
                         continue
                     if session.status not in ACTIVE_DRAFT_STATUSES:
@@ -380,11 +380,10 @@ async def websocket_endpoint(
                         },
                     })
 
-                    passed = _swap_passes.get(session.id, set())
-                    if free_char_service.check_phase_complete(session, passed, db):
+                    if free_char_service.check_phase_complete(session, db):
                         session.status = "complete"
                         db.commit()
-                        final = free_char_service.get_final_teams(session, passed, db)
+                        final = free_char_service.get_final_teams(session, db)
                         await manager.broadcast_to_room(room_code, {
                             "event": "SESSION_COMPLETE",
                             "payload": {"final_teams": final},
@@ -398,18 +397,17 @@ async def websocket_endpoint(
                     if role not in ("player_a", "player_b"):
                         continue
 
-                    _swap_passes[session.id].add(role)
+                    free_char_service.record_pass(session, role, db)
 
                     await manager.broadcast_to_room(room_code, {
                         "event": "PLAYER_PASSED_SWAP",
                         "payload": {"player": role},
                     })
 
-                    passed = _swap_passes[session.id]
-                    if free_char_service.check_phase_complete(session, passed, db):
+                    if free_char_service.check_phase_complete(session, db):
                         session.status = "complete"
                         db.commit()
-                        final = free_char_service.get_final_teams(session, passed, db)
+                        final = free_char_service.get_final_teams(session, db)
                         await manager.broadcast_to_room(room_code, {
                             "event": "SESSION_COMPLETE",
                             "payload": {"final_teams": final},
@@ -451,8 +449,11 @@ async def websocket_endpoint(
 
                 # ── PING / HEARTBEAT ──────────────────────────────────────────────
                 elif event == "PING":
-                    # Simply keeping the connection alive; optional PONG reply
                     await ws.send_json({"event": "PONG"})
+                    continue
+
+                elif event == "PONG":
+                    # Client-to-server PONG; safely ignore or use to update metrics
                     continue
 
                 # ── SYNC_STATE ────────────────────────────────────────────────────
@@ -533,7 +534,8 @@ async def websocket_endpoint(
                     if role != "admin":
                         await _err(ws, "Only admins can pause.")
                         continue
-                    _paused_rooms.add(room_code)
+                    session.is_paused = True
+                    db.commit()
                     await manager.broadcast_to_room(room_code, {
                         "event": "ADMIN_PAUSE",
                         "payload": {"paused": True},
@@ -544,7 +546,8 @@ async def websocket_endpoint(
                     if role != "admin":
                         await _err(ws, "Only admins can resume.")
                         continue
-                    _paused_rooms.discard(room_code)
+                    session.is_paused = False
+                    db.commit()
                     await manager.broadcast_to_room(room_code, {
                         "event": "ADMIN_RESUME",
                         "payload": {"paused": False},
@@ -621,11 +624,10 @@ async def websocket_endpoint(
                     session.toss_winner_choice = None
                     session.first_pick_player = None
                     session.first_half_player = None
+                    session.is_paused = False
+                    session.player_a_passed = False
+                    session.player_b_passed = False
                     db.commit()
-
-                    # Clear in-memory state
-                    _swap_passes.pop(session.id, None)
-                    _paused_rooms.discard(room_code)
 
                     # Send fresh snapshot to everyone
                     await manager.broadcast_to_room(room_code, {

@@ -79,36 +79,32 @@ def submit_swap(
 
 
 def record_pass(session: DraftSession, player: str, db: Session) -> None:
-    """
-    A player passes their swap privilege.
-    We record this as a swap where original_char_id = free_char_id = 0 (sentinel).
-    Simpler alternative: track passes in-memory in the WS handler.
-    This service uses an in-memory approach — the WS handler maintains a set of
-    players who have passed and calls `check_phase_complete`.
-    """
-    pass  # Handled by pass_set in the WebSocket handler (see handlers.py)
+    """A player passes their swap privilege. Persists to DB."""
+    if player == "player_a":
+        session.player_a_passed = True
+    elif player == "player_b":
+        session.player_b_passed = True
+    db.commit()
+    db.refresh(session)
 
 
 def check_phase_complete(
     session: DraftSession,
-    passed_players: set[str],
     db: Session,
 ) -> bool:
-    """
-    Returns True if the Team Building phase is over:
-    — both players have either swapped OR passed.
-    """
+    """Returns True if both players have either swapped OR passed."""
     swapped = {
         row.player
         for row in db.query(TeamBuildingSwap)
         .filter(TeamBuildingSwap.session_id == session.id)
         .all()
     }
-    done = swapped | passed_players
-    return "player_a" in done and "player_b" in done
+    a_done = ("player_a" in swapped) or session.player_a_passed
+    b_done = ("player_b" in swapped) or session.player_b_passed
+    return a_done and b_done
 
 
-def get_final_teams(session: DraftSession, passed_players: set[str], db: Session) -> dict:
+def get_final_teams(session: DraftSession, db: Session) -> dict:
     """
     Compute each player's final roster after any swaps.
     Returns:

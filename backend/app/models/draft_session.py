@@ -52,8 +52,12 @@ class DraftSession(Base):
     # ── Resolved Advantages ───────────────────────────────────────────────────
     # Which player picks first (determined after coin toss resolution)
     first_pick_player: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
-    # Which player plays the Abyss first half
     first_half_player: Mapped[Optional[str]] = mapped_column(String(10), nullable=True)
+    
+    # ── Persistence (for server restarts/reconnects) ──────────────────────────
+    is_paused: Mapped[bool] = mapped_column(Integer, nullable=False, default=False)
+    player_a_passed: Mapped[bool] = mapped_column(Integer, nullable=False, default=False)
+    player_b_passed: Mapped[bool] = mapped_column(Integer, nullable=False, default=False)
 
     # ── Timestamps ────────────────────────────────────────────────────────────
     created_at: Mapped[datetime] = mapped_column(
