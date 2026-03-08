@@ -1,0 +1,567 @@
+[
+    {
+        "name": "Sucrose",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Sucrose.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Sucrose.webp"
+    },
+    {
+        "name": "Keqing",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Keqing.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Keqing.webp"
+    },
+    {
+        "name": "Mona",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Mona.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Mona.webp"
+    },
+    {
+        "name": "Diona",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Diona.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Diona.webp"
+    },
+    {
+        "name": "Albedo",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Albedo.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Albedo.webp"
+    },
+    {
+        "name": "Ganyu",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ganyu.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ganyu.webp"
+    },
+    {
+        "name": "Chongyun",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Chongyun.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Chongyun.webp"
+    },
+    {
+        "name": "Qiqi",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Qiqi.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Qiqi.webp"
+    },
+    {
+        "name": "Noelle",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Noel.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Noel.webp"
+    },
+    {
+        "name": "Tartaglia",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Tartaglia.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Tartaglia.webp"
+    },
+    {
+        "name": "Bennett",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Bennett.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Bennett.webp"
+    },
+    {
+        "name": "Fischl",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Fischl.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Fischl.webp"
+    },
+    {
+        "name": "Zhongli",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Zhongli.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Zhongli.webp"
+    },
+    {
+        "name": "Klee",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Klee.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Klee.webp"
+    },
+    {
+        "name": "Ningguang",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ningguang.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ningguang.webp"
+    },
+    {
+        "name": "Xiao",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Xiao.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Xiao.webp"
+    },
+    {
+        "name": "Xingqiu",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Xingqiu.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Xingqiu.webp"
+    },
+    {
+        "name": "Beidou",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Beidou.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Beidou.webp"
+    },
+    {
+        "name": "Xiangling",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Xiangling.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Xiangling.webp"
+    },
+    {
+        "name": "Venti",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Venti.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Venti.webp"
+    },
+    {
+        "name": "Amber",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ambor.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ambor.webp"
+    },
+    {
+        "name": "Razor",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Razor.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Razor.webp"
+    },
+    {
+        "name": "Diluc",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Diluc.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Diluc.webp"
+    },
+    {
+        "name": "Kaeya",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Kaeya.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Kaeya.webp"
+    },
+    {
+        "name": "Barbara",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Barbara.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Barbara.webp"
+    },
+    {
+        "name": "Lisa",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Lisa.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Lisa.webp"
+    },
+    {
+        "name": "Jean",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Qin.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Qin.webp"
+    },
+    {
+        "name": "Ayaka",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ayaka.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ayaka.webp"
+    },
+    {
+        "name": "Lumine",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_PlayerGirl.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_PlayerGirl.webp"
+    },
+    {
+        "name": "Aether",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_PlayerBoy.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_PlayerBoy.webp"
+    },
+    {
+        "name": "Mika",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Mika.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Mika.webp"
+    },
+    {
+        "name": "Dehya",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Dehya.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Dehya.webp"
+    },
+    {
+        "name": "Alhaitham",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Alhatham.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Alhatham.webp"
+    },
+    {
+        "name": "Yaoyao",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Yaoyao.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Yaoyao.webp"
+    },
+    {
+        "name": "Faruzan",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Faruzan.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Faruzan.webp"
+    },
+    {
+        "name": "Wanderer",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Wanderer.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Wanderer.webp"
+    },
+    {
+        "name": "Layla",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Layla.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Layla.webp"
+    },
+    {
+        "name": "Nahida",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Nahida.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Nahida.webp"
+    },
+    {
+        "name": "Candace",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Candace.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Candace.webp"
+    },
+    {
+        "name": "Cyno",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Cyno.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Cyno.webp"
+    },
+    {
+        "name": "Nilou",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Nilou.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Nilou.webp"
+    },
+    {
+        "name": "Tighnari",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Tighnari.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Tighnari.webp"
+    },
+    {
+        "name": "Dori",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Dori.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Dori.webp"
+    },
+    {
+        "name": "Collei",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Collei.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Collei.webp"
+    },
+    {
+        "name": "Ayato",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ayato.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ayato.webp"
+    },
+    {
+        "name": "Shinobu",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Shinobu.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Shinobu.webp"
+    },
+    {
+        "name": "Yun Jin",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Yunjin.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Yunjin.webp"
+    },
+    {
+        "name": "Shenhe",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Shenhe.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Shenhe.webp"
+    },
+    {
+        "name": "Aloy",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Aloy.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Aloy.webp"
+    },
+    {
+        "name": "Kirara",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Momoka.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Momoka.webp"
+    },
+    {
+        "name": "Yelan",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Yelan.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Yelan.webp"
+    },
+    {
+        "name": "Shikanoin Heizou",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Heizo.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Heizo.webp"
+    },
+    {
+        "name": "Yae Miko",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Yae.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Yae.webp"
+    },
+    {
+        "name": "Arataki Itto",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Itto.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Itto.webp"
+    },
+    {
+        "name": "Kujou Sara",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Sara.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Sara.webp"
+    },
+    {
+        "name": "Gorou",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Gorou.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Gorou.webp"
+    },
+    {
+        "name": "Sangonomiya Kokomi",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Kokomi.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Kokomi.webp"
+    },
+    {
+        "name": "Sayu",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Sayu.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Sayu.webp"
+    },
+    {
+        "name": "Raiden Shogun",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Shougun.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Shougun.webp"
+    },
+    {
+        "name": "Eula",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Eula.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Eula.webp"
+    },
+    {
+        "name": "Thoma",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Tohma.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Tohma.webp"
+    },
+    {
+        "name": "Yoimiya",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Yoimiya.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Yoimiya.webp"
+    },
+    {
+        "name": "Yanfei",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Feiyan.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Feiyan.webp"
+    },
+    {
+        "name": "Kazuha",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Kazuha.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Kazuha.webp"
+    },
+    {
+        "name": "Hu Tao",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Hutao.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Hutao.webp"
+    },
+    {
+        "name": "Rosaria",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Rosaria.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Rosaria.webp"
+    },
+    {
+        "name": "Xinyan",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Xinyan.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Xinyan.webp"
+    },
+    {
+        "name": "Lauma",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Lauma.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Lauma.webp"
+    },
+    {
+        "name": "Ineffa",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ineffa.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ineffa.webp"
+    },
+    {
+        "name": "Dahlia",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Dahlia.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Dahlia.webp"
+    },
+    {
+        "name": "Skirk",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_SkirkNew.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_SkirkNew.webp"
+    },
+    {
+        "name": "Ifa",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Ifa.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ifa.webp"
+    },
+    {
+        "name": "Escoffier",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Escoffier.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Escoffier.webp"
+    },
+    {
+        "name": "Varesa",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Varesa.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Varesa.webp"
+    },
+    {
+        "name": "Iansan",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Iansan.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Iansan.webp"
+    },
+    {
+        "name": "Mizuki",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Mizuki.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Mizuki.webp"
+    },
+    {
+        "name": "Lanyan",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Lanyan.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Lanyan.webp"
+    },
+    {
+        "name": "Citlali",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Citlali.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Citlali.webp"
+    },
+    {
+        "name": "Mavuika",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Mavuika.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Mavuika.webp"
+    },
+    {
+        "name": "Ororon",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Olorun.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Olorun.webp"
+    },
+    {
+        "name": "Chasca",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Chasca.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Chasca.webp"
+    },
+    {
+        "name": "Xilonen",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Xilonen.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Xilonen.webp"
+    },
+    {
+        "name": "Mualani",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Mualani.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Mualani.webp"
+    },
+    {
+        "name": "Kinich",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Kinich.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Kinich.webp"
+    },
+    {
+        "name": "Kachina",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Kachina.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Kachina.webp"
+    },
+    {
+        "name": "Emilie",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Emilie.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Emilie.webp"
+    },
+    {
+        "name": "Clorinde",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Clorinde.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Clorinde.webp"
+    },
+    {
+        "name": "Sethos",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Sethos.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Sethos.webp"
+    },
+    {
+        "name": "Arlecchino",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Arlecchino.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Arlecchino.webp"
+    },
+    {
+        "name": "Sigewinne",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Sigewinne.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Sigewinne.webp"
+    },
+    {
+        "name": "Chiori",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Chiori.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Chiori.webp"
+    },
+    {
+        "name": "Xianyun",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Liuyun.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Liuyun.webp"
+    },
+    {
+        "name": "Gaming",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Gaming.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Gaming.webp"
+    },
+    {
+        "name": "Navia",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Navia.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Navia.webp"
+    },
+    {
+        "name": "Chevreuse",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Chevreuse.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Chevreuse.webp"
+    },
+    {
+        "name": "Furina",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Furina.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Furina.webp"
+    },
+    {
+        "name": "Charlotte",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Charlotte.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Charlotte.webp"
+    },
+    {
+        "name": "Neuvillette",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Neuvillette.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Neuvillette.webp"
+    },
+    {
+        "name": "Wriothesley",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Wriothesley.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Wriothesley.webp"
+    },
+    {
+        "name": "Freminet",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Freminet.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Freminet.webp"
+    },
+    {
+        "name": "Lyney",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Liney.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Liney.webp"
+    },
+    {
+        "name": "Lynette",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Linette.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Linette.webp"
+    },
+    {
+        "name": "Baizhu",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Baizhuer.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Baizhuer.webp"
+    },
+    {
+        "name": "Kaveh",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Kaveh.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Kaveh.webp"
+    },
+    {
+        "name": "Varka",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Varka.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Varka.webp"
+    },
+    {
+        "name": "Illuga",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Illuga.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Illuga.webp"
+    },
+    {
+        "name": "Zibai",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Zibai.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Zibai.webp"
+    },
+    {
+        "name": "Columbina",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Columbina.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Columbina.webp"
+    },
+    {
+        "name": "Jahoda",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Jahoda.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Jahoda.webp"
+    },
+    {
+        "name": "Durin",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Durin.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Durin.webp"
+    },
+    {
+        "name": "Nefer",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Nefer.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Nefer.webp"
+    },
+    {
+        "name": "Aino",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Aino.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Aino.webp"
+    },
+    {
+        "name": "Linnea",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Linnea.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Linnea.webp"
+    }
+]
