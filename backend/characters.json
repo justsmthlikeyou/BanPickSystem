@@ -140,6 +140,16 @@
         "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Ayaka.webp"
     },
     {
+        "name": "MannequinGirl",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_MannequinGirl.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_MannequinGirl.webp"
+    },
+    {
+        "name": "MannequinBoy",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_MannequinBoy.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_MannequinBoy.webp"
+    },
+    {
         "name": "Lumine",
         "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_PlayerGirl.webp",
         "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_PlayerGirl.webp"
