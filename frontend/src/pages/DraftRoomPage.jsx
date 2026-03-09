@@ -8,6 +8,8 @@ import PrimaryButton from '../components/ui/PrimaryButton'
 import { CasterTeamColumn, CasterSpotlight, CompleteSummary } from '../components/CasterComponents'
 import { useAudioManager } from '../hooks/useAudioManager'
 import AudioController from '../components/AudioController'
+import TeamBuildingView from '../components/TeamBuildingView'
+
 
 /* ═══════════════════════════════════════════════════════════════════════════
    DraftRoomPage — Premium Esports Ban/Pick Room + Admin/Caster Mode
@@ -600,18 +602,7 @@ export default function DraftRoomPage() {
                                     <div className="flex-1 h-full relative overflow-hidden flex flex-col">
                                         {/* Team building / Complete states */}
                                         {phase === 'team_building' && (
-                                            <div className="flex-1 flex items-center justify-center">
-                                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-                                                    <div className="w-20 h-20 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                                                        style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)' }}>
-                                                        <span className="text-4xl">🔄</span>
-                                                    </div>
-                                                    <h2 className="text-3xl font-bold text-white mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>
-                                                        Team Building Phase
-                                                    </h2>
-                                                    <p className="text-zinc-500 text-sm">Players are swapping characters with Season Free Characters.</p>
-                                                </motion.div>
-                                            </div>
+                                            <TeamBuildingView />
                                         )}
 
                                         {phase === 'complete' && (
@@ -663,16 +654,7 @@ export default function DraftRoomPage() {
                                     {/* Left: Draft Content (55%) */}
                                     <div className="w-full lg:w-[55%] h-full flex flex-col overflow-hidden box-border" style={{ padding: '20px 24px' }}>
                                         {phase === 'team_building' && (
-                                            <div className="flex-1 flex items-center justify-center">
-                                                <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center">
-                                                    <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-6"
-                                                        style={{ background: 'rgba(168,85,247,0.1)', border: '1px solid rgba(168,85,247,0.2)' }}>
-                                                        <span className="text-3xl">🔄</span>
-                                                    </div>
-                                                    <h2 className="text-2xl font-bold text-white mb-2" style={{ fontFamily: 'Rajdhani, sans-serif' }}>Team Building Phase</h2>
-                                                    <p className="text-zinc-500 text-sm max-w-sm mx-auto">You may swap ONE drafted character with a Season Free Character, or pass.</p>
-                                                </motion.div>
-                                            </div>
+                                            <TeamBuildingView />
                                         )}
                                         {phase === 'complete' && (
                                             <div className="flex-1 flex items-center justify-center overflow-y-auto">

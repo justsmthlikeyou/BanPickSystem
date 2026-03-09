@@ -173,6 +173,7 @@ const useDraftStore = create((set, get) => ({
             selectedPreview: null, coinTossResult: null, coinTossWinner: null,
             coinTossLoser: null, winnerChose: null, loserChose: null,
             finalTeams: null,
+            freeChars: [],
             swapState: { selectedDraftedId: null, selectedFreeId: null, hasActed: false, opponentActed: false },
             pendingActionTimer: null
         })
@@ -212,6 +213,15 @@ const useDraftStore = create((set, get) => ({
             coinTossLoser: snapshot.coin_toss_winner
                 ? (snapshot.coin_toss_winner === 'player_a' ? 'player_b' : 'player_a')
                 : null,
+            freeChars: snapshot.free_characters || [],
+            // Rehydrate teams from CSV strings
+            swapState: {
+                ...get().swapState,
+                player_a_team1: snapshot.player_a_team1 ? snapshot.player_a_team1.split(',').map(Number) : [],
+                player_a_team2: snapshot.player_a_team2 ? snapshot.player_a_team2.split(',').map(Number) : [],
+                player_b_team1: snapshot.player_b_team1 ? snapshot.player_b_team1.split(',').map(Number) : [],
+                player_b_team2: snapshot.player_b_team2 ? snapshot.player_b_team2.split(',').map(Number) : []
+            }
         })
     },
 
@@ -241,6 +251,10 @@ const useDraftStore = create((set, get) => ({
         } else {
             console.warn('[WS] Cannot send — socket not open:', event)
         }
+    },
+
+    submitTeams: (team1, team2) => {
+        get().sendEvent('SUBMIT_TEAMS', { team1, team2 })
     },
 
     // ── WebSocket Event Router ─────────────────────────────────────────────────
@@ -378,6 +392,19 @@ const useDraftStore = create((set, get) => ({
             //── Select preview (global click sync) ─────────────────────────────
             case 'SELECT_PREVIEW': {
                 set({ selectedPreview: { player: payload.player, character_id: payload.character_id } })
+                break
+            }
+
+            //── Team Update ────────────────────────────────────────────────────────
+            case 'TEAMS_UPDATED': {
+                const { player, team1, team2 } = payload
+                set((s) => ({
+                    swapState: {
+                        ...s.swapState,
+                        [`${player}_team1`]: team1,
+                        [`${player}_team2`]: team2,
+                    }
+                }))
                 break
             }
 
