@@ -59,6 +59,12 @@ class DraftSession(Base):
     player_a_passed: Mapped[bool] = mapped_column(Integer, nullable=False, default=False)
     player_b_passed: Mapped[bool] = mapped_column(Integer, nullable=False, default=False)
 
+    # ── Team Configurations (stored as comma-separated IDs or JSON) ──────────
+    player_a_team1: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    player_a_team2: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    player_b_team1: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+    player_b_team2: Mapped[Optional[str]] = mapped_column(String(50), nullable=True)
+
     # ── Timestamps ────────────────────────────────────────────────────────────
     created_at: Mapped[datetime] = mapped_column(
         DateTime, nullable=False, server_default=func.now()

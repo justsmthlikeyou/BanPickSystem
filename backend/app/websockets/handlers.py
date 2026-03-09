@@ -65,6 +65,14 @@ def _build_snapshot(session: DraftSession, db: Session) -> dict:
         TeamBuildingSwap.session_id == session.id
     ).all()
 
+    free_chars = []
+    if session.status in ("team_building", "complete"):
+        from app.services import free_char_service
+        free_chars = [
+            {"id": c.id, "name": c.name, "icon_url": c.icon_url}
+            for c in free_char_service.get_free_characters(session, db)
+        ]
+
     return {
         "id": session.id,
         "room_code": session.room_code,
@@ -97,6 +105,11 @@ def _build_snapshot(session: DraftSession, db: Session) -> dict:
             }
             for s in swaps
         ],
+        "free_characters": free_chars,
+        "player_a_team1": session.player_a_team1,
+        "player_a_team2": session.player_a_team2,
+        "player_b_team1": session.player_b_team1,
+        "player_b_team2": session.player_b_team2,
     }
 
 
@@ -412,6 +425,43 @@ async def websocket_endpoint(
                             "event": "SESSION_COMPLETE",
                             "payload": {"final_teams": final},
                         })
+
+                # ── SUBMIT_TEAMS ──────────────────────────────────────────────────
+                elif event == "SUBMIT_TEAMS":
+                    if session.status != "team_building":
+                        await _err(ws, "Only in team_building phase.")
+                        continue
+                    if role not in ("player_a", "player_b"):
+                        continue
+
+                    team1 = ep.get("team1") # List of 4 IDs
+                    team2 = ep.get("team2") # List of 4 IDs
+
+                    if not isinstance(team1, list) or not isinstance(team2, list):
+                        await _err(ws, "Invalid team format.")
+                        continue
+
+                    # Store as comma-separated string for simplicity in SQLite
+                    team_str1 = ",".join(map(str, team1))
+                    team_str2 = ",".join(map(str, team2))
+
+                    if role == "player_a":
+                        session.player_a_team1 = team_str1
+                        session.player_a_team2 = team_str2
+                    else:
+                        session.player_b_team1 = team_str1
+                        session.player_b_team2 = team_str2
+
+                    db.commit()
+
+                    await manager.broadcast_to_room(room_code, {
+                        "event": "TEAMS_UPDATED",
+                        "payload": {
+                            "player": role,
+                            "team1": team1,
+                            "team2": team2
+                        }
+                    })
 
                 # ── HOVER_PREVIEW (any client → broadcast to room) ────────────────
                 elif event == "HOVER_PREVIEW":
