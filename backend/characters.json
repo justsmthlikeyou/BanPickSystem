@@ -560,6 +560,11 @@
         "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Aino.webp"
     },
     {
+        "name": "Flins",
+        "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Flins.webp",
+        "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Flins.webp"
+    },
+    {
         "name": "Linnea",
         "icon_url": "https://static.nanoka.cc/assets/gi/UI_AvatarIcon_Linnea.webp",
         "splash_art_url": "https://static.nanoka.cc/assets/gi/UI_Gacha_AvatarImg_Linnea.webp"

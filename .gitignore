@@ -35,3 +35,10 @@ Thumbs.db
 
 # Alembic (keep migrations folder, ignore compiled)
 *.pyc
+
+# Node
+node_modules/
+frontend/node_modules/
+frontend/dist/
+backend/venv/
+backend/.venv/
