@@ -602,7 +602,7 @@ export default function DraftRoomPage() {
                                     <div className="flex-1 h-full relative overflow-hidden flex flex-col">
                                         {/* Team building / Complete states */}
                                         {phase === 'team_building' && (
-                                            <TeamBuildingView />
+                                            <TeamBuildingView key={session?.id || 'building'} />
                                         )}
 
                                         {phase === 'complete' && (
@@ -651,10 +651,10 @@ export default function DraftRoomPage() {
                                    PLAYER LAYOUT — 55 / 45
                                    ═══════════════════════════════════════════════ */
                                 <>
-                                    {/* Left: Draft Content (55%) */}
-                                    <div className="w-full lg:w-[55%] h-full flex flex-col overflow-hidden box-border" style={{ padding: '20px 24px' }}>
+                                    {/* Left: Draft Content (55% or 100% during team building) */}
+                                    <div className={`${phase === 'team_building' || phase === 'complete' ? 'w-full' : 'w-full lg:w-[55%]'} h-full flex flex-col overflow-hidden box-border`} style={{ padding: phase === 'team_building' ? '0' : '20px 24px' }}>
                                         {phase === 'team_building' && (
-                                            <TeamBuildingView />
+                                            <TeamBuildingView key={session?.id || 'building'} />
                                         )}
                                         {phase === 'complete' && (
                                             <div className="flex-1 flex items-center justify-center overflow-y-auto">
@@ -677,7 +677,7 @@ export default function DraftRoomPage() {
 
                                                 <div className="flex-1 overflow-y-auto h-full rounded-2xl relative box-border scroll-smooth" style={{ background: '#0d0e14', border: '1px solid rgba(255,255,255,0.03)' }}>
                                                     <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-9 gap-2 pl-4 pr-6 pt-5 pb-48 box-border">
-                                                        {filteredCharacters.map((char) => {
+                                                        {(filteredCharacters || []).map((char) => {
                                                             const isBanned = bannedIds.has(char.id)
                                                             const isPickedA = pickedByA.has(char.id)
                                                             const isPickedB = pickedByB.has(char.id)
@@ -717,96 +717,98 @@ export default function DraftRoomPage() {
                                         )}
                                     </div>
 
-                                    {/* Right: Art Panel (45%) containing BOTH Team Panels */}
-                                    <div className="hidden lg:flex lg:w-[45%] h-full max-h-screen flex-col bg-[#050508] border-l border-white/5 overflow-hidden pb-4">
+                                    {/* Right: Art Panel (45%) - Hidden during full-screen phases */}
+                                    {phase !== 'team_building' && phase !== 'complete' && (
+                                        <div className="hidden lg:flex lg:w-[45%] h-full max-h-screen flex-col bg-[#050508] border-l border-white/5 overflow-hidden pb-4">
 
-                                        {/* Top: Opponent Team Panel */}
-                                        {isActiveDraft && (
-                                            <div className="flex-shrink-0 h-[25%] flex flex-col justify-center p-4 md:p-6 pb-2 border-b border-white/5 bg-[#08090d] z-20">
-                                                <TeamPanel
-                                                    label={activeRole === 'player_a' ? "Team B (Opponent)" : "Team A (Opponent)"}
-                                                    player={activeRole === 'player_a' ? 'player_b' : 'player_a'}
-                                                    accentColor={activeRole === 'player_a' ? "#a78bfa" : "#818cf8"}
-                                                    slots={draftSlots} charMap={charMap} currentSlot={curSlot}
-                                                />
-                                            </div>
-                                        )}
+                                            {/* Top: Opponent Team Panel */}
+                                            {isActiveDraft && (
+                                                <div className="flex-shrink-0 h-[25%] flex flex-col justify-center p-4 md:p-6 pb-2 border-b border-white/5 bg-[#08090d] z-20">
+                                                    <TeamPanel
+                                                        label={activeRole === 'player_a' ? "Team B (Opponent)" : "Team A (Opponent)"}
+                                                        player={activeRole === 'player_a' ? 'player_b' : 'player_a'}
+                                                        accentColor={activeRole === 'player_a' ? "#a78bfa" : "#818cf8"}
+                                                        slots={draftSlots} charMap={charMap} currentSlot={curSlot}
+                                                    />
+                                                </div>
+                                            )}
 
-                                        {/* Middle: Action Zone (Splash Art & Confirm) */}
-                                        <div className="flex-1 min-h-0 relative w-full flex flex-col justify-end p-4 md:p-6 bg-[#08090d] overflow-hidden">
-                                            <AnimatePresence mode="wait">
-                                                {previewChar?.splash_art_url ? (
-                                                    <motion.div key={`art-${previewChar.id}`}
-                                                        initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 0.8, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                                                        transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                                                        className="absolute inset-0"
-                                                    >
-                                                        <img src={previewChar.splash_art_url} alt={previewChar.name} className="absolute inset-0 w-full h-full object-contain object-center opacity-90 z-0 pointer-events-none" />
-                                                    </motion.div>
-                                                ) : (
-                                                    <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center">
-                                                        <div className="text-center">
-                                                            <span className="text-6xl opacity-10">⚔️</span>
-                                                            <p className="text-zinc-700 text-sm mt-4 tracking-widest uppercase font-bold">Select a character</p>
-                                                        </div>
-                                                    </motion.div>
-                                                )}
-                                            </AnimatePresence>
-
-                                            {/* Gradient Overlays */}
-                                            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, #08090d 0%, rgba(8,9,13,0.4) 20%, transparent 60%)' }} />
-                                            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, #08090d 0%, transparent 40%)' }} />
-                                            <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(8,9,13,0.4) 0%, transparent 30%)' }} />
-
-                                            <AnimatePresence>
-                                                {lastLockedChar && (
-                                                    <motion.div key="lock-flash" initial={{ opacity: 0.8 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }}
-                                                        transition={{ duration: 1.5 }} className="absolute inset-0 pointer-events-none"
-                                                        style={{ background: lastLockedChar.type === 'ban' ? 'radial-gradient(circle at center, rgba(239,68,68,0.2) 0%, transparent 70%)' : 'radial-gradient(circle at center, rgba(99,102,241,0.2) 0%, transparent 70%)' }} />
-                                                )}
-                                            </AnimatePresence>
-
-                                            <div className="relative z-10 w-full mb-2">
+                                            {/* Middle: Action Zone (Splash Art & Confirm) */}
+                                            <div className="flex-1 min-h-0 relative w-full flex flex-col justify-end p-4 md:p-6 bg-[#08090d] overflow-hidden">
                                                 <AnimatePresence mode="wait">
-                                                    {previewChar && (
-                                                        <motion.div key={`info-${previewChar.id}`}
-                                                            initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-                                                            transition={{ duration: 0.3 }} className="max-w-sm relative z-10">
-                                                            <h3 className="text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Rajdhani, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>{previewChar.name}</h3>
-                                                            {isPlayer && myTurn && !isPaused && selectedCharId && (
-                                                                <PrimaryButton onClick={handleConfirm}>
-                                                                    {curSlot?.type === 'ban' ? 'CONFIRM BAN' : 'CONFIRM PICK'}
-                                                                </PrimaryButton>
-                                                            )}
+                                                    {previewChar?.splash_art_url ? (
+                                                        <motion.div key={`art-${previewChar.id}`}
+                                                            initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 0.8, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                                                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                                                            className="absolute inset-0"
+                                                        >
+                                                            <img src={previewChar.splash_art_url} alt={previewChar.name} className="absolute inset-0 w-full h-full object-contain object-center opacity-90 z-0 pointer-events-none" />
+                                                        </motion.div>
+                                                    ) : (
+                                                        <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center">
+                                                            <div className="text-center">
+                                                                <span className="text-6xl opacity-10">⚔️</span>
+                                                                <p className="text-zinc-700 text-sm mt-4 tracking-widest uppercase font-bold">Select a character</p>
+                                                            </div>
                                                         </motion.div>
                                                     )}
                                                 </AnimatePresence>
 
-                                                {/* Skip Ban Button */}
-                                                {isPlayer && myTurn && !isPaused && phase.includes('ban') && (
-                                                    <motion.button
-                                                        initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                                        onClick={handleSkipBan}
-                                                        className="w-full max-w-sm mt-3 py-3 font-bold text-zinc-400 bg-transparent border-2 border-zinc-700 rounded-xl hover:bg-zinc-800 hover:text-white transition-all tracking-widest uppercase text-sm"
-                                                    >
-                                                        SKIP BAN
-                                                    </motion.button>
-                                                )}
-                                            </div>
-                                        </div>
+                                                {/* Gradient Overlays */}
+                                                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, #08090d 0%, rgba(8,9,13,0.4) 20%, transparent 60%)' }} />
+                                                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, #08090d 0%, transparent 40%)' }} />
+                                                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(8,9,13,0.4) 0%, transparent 30%)' }} />
 
-                                        {/* Bottom: My Team Panel */}
-                                        {isActiveDraft && (
-                                            <div className="flex-shrink-0 h-[25%] flex flex-col justify-center p-4 md:p-6 pt-2 border-t border-white/5 bg-[#08090d] z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
-                                                <TeamPanel
-                                                    label={activeRole === 'player_a' ? "Team A (You)" : "Team B (You)"}
-                                                    player={activeRole === 'player_a' ? 'player_a' : 'player_b'}
-                                                    accentColor={activeRole === 'player_a' ? "#818cf8" : "#a78bfa"}
-                                                    slots={draftSlots} charMap={charMap} currentSlot={curSlot}
-                                                />
+                                                <AnimatePresence>
+                                                    {lastLockedChar && (
+                                                        <motion.div key="lock-flash" initial={{ opacity: 0.8 }} animate={{ opacity: 0 }} exit={{ opacity: 0 }}
+                                                            transition={{ duration: 1.5 }} className="absolute inset-0 pointer-events-none"
+                                                            style={{ background: lastLockedChar.type === 'ban' ? 'radial-gradient(circle at center, rgba(239,68,68,0.2) 0%, transparent 70%)' : 'radial-gradient(circle at center, rgba(99,102,241,0.2) 0%, transparent 70%)' }} />
+                                                    )}
+                                                </AnimatePresence>
+
+                                                <div className="relative z-10 w-full mb-2">
+                                                    <AnimatePresence mode="wait">
+                                                        {previewChar && (
+                                                            <motion.div key={`info-${previewChar.id}`}
+                                                                initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
+                                                                transition={{ duration: 0.3 }} className="max-w-sm relative z-10">
+                                                                <h3 className="text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Rajdhani, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>{previewChar.name}</h3>
+                                                                {isPlayer && myTurn && !isPaused && selectedCharId && (
+                                                                    <PrimaryButton onClick={handleConfirm}>
+                                                                        {curSlot?.type === 'ban' ? 'CONFIRM BAN' : 'CONFIRM PICK'}
+                                                                    </PrimaryButton>
+                                                                )}
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
+
+                                                    {/* Skip Ban Button */}
+                                                    {isPlayer && myTurn && !isPaused && phase.includes('ban') && (
+                                                        <motion.button
+                                                            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                                            onClick={handleSkipBan}
+                                                            className="w-full max-w-sm mt-3 py-3 font-bold text-zinc-400 bg-transparent border-2 border-zinc-700 rounded-xl hover:bg-zinc-800 hover:text-white transition-all tracking-widest uppercase text-sm"
+                                                        >
+                                                            SKIP BAN
+                                                        </motion.button>
+                                                    )}
+                                                </div>
                                             </div>
-                                        )}
-                                    </div>
+
+                                            {/* Bottom: My Team Panel */}
+                                            {isActiveDraft && (
+                                                <div className="flex-shrink-0 h-[25%] flex flex-col justify-center p-4 md:p-6 pt-2 border-t border-white/5 bg-[#08090d] z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
+                                                    <TeamPanel
+                                                        label={activeRole === 'player_a' ? "Team A (You)" : "Team B (You)"}
+                                                        player={activeRole === 'player_a' ? 'player_a' : 'player_b'}
+                                                        accentColor={activeRole === 'player_a' ? "#818cf8" : "#a78bfa"}
+                                                        slots={draftSlots} charMap={charMap} currentSlot={curSlot}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    )}
                                 </>
                             )}
 
@@ -973,11 +975,11 @@ function TeamPanel({ label, player, accentColor, slots, charMap, currentSlot }) 
                 </span>
             </div>
             <div className="flex gap-1 items-start flex-wrap flex-shrink-0">
-                {banSlots.map((slot) => (
+                {(banSlots || []).map((slot) => (
                     <SlotCell key={slot.seq} slot={slot} charMap={charMap} isCurrent={currentSlot?.seq === slot.seq} isBan={true} />
                 ))}
                 {banSlots.length > 0 && <div className="w-px h-10 mx-1" style={{ background: 'rgba(255,255,255,0.06)' }} />}
-                {pickSlots.map((slot) => (
+                {(pickSlots || []).map((slot) => (
                     <SlotCell key={slot.seq} slot={slot} charMap={charMap} isCurrent={currentSlot?.seq === slot.seq} isBan={false} />
                 ))}
             </div>

@@ -438,7 +438,7 @@ export default function LobbyPage() {
 
                                     {/* Table rows */}
                                     <AnimatePresence>
-                                        {liveSessions.map((sess, i) => {
+                                        {(liveSessions || []).map((sess, i) => {
                                             const st = STATUS_STYLE[sess.status] || DEFAULT_STATUS
                                             const pa = sess.player_a_id ? 1 : 0
                                             const pb = sess.player_b_id ? 1 : 0

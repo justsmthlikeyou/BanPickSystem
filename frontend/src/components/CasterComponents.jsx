@@ -6,9 +6,9 @@ import PrimaryButton from './ui/PrimaryButton'
    ═══════════════════════════════════════════════════════════════════════════ */
 
 export function CasterTeamColumn({ label, player, accentColor, side, slots, charMap, currentSlot }) {
-    const playerSlots = slots.filter((s) => s.acting_player === player)
-    const banSlots = playerSlots.filter((s) => s.type === 'ban')
-    const pickSlots = playerSlots.filter((s) => s.type === 'pick')
+    const playerSlots = (slots || []).filter((s) => s && s.acting_player === player)
+    const banSlots = playerSlots.filter((s) => s && s.type === 'ban')
+    const pickSlots = playerSlots.filter((s) => s && s.type === 'pick')
 
     return (
         <div className="w-[25%] h-full flex flex-col overflow-hidden flex-shrink-0"
@@ -30,7 +30,7 @@ export function CasterTeamColumn({ label, player, accentColor, side, slots, char
             <div className="px-3 pt-3 pb-1 flex-shrink-0">
                 <p className="text-[9px] text-zinc-700 font-bold tracking-[0.2em] uppercase mb-2 px-1">BANS</p>
                 <div className="flex gap-2">
-                    {banSlots.map((slot) => (
+                    {(banSlots || []).map((slot) => (
                         <CasterSlot key={slot.seq} slot={slot} charMap={charMap} isCurrent={currentSlot?.seq === slot.seq} isBan />
                     ))}
                 </div>
@@ -43,7 +43,7 @@ export function CasterTeamColumn({ label, player, accentColor, side, slots, char
             <div className="px-3 pt-1 pb-3 flex-1 overflow-y-auto">
                 <p className="text-[9px] text-zinc-700 font-bold tracking-[0.2em] uppercase mb-2 px-1">PICKS</p>
                 <div className="flex flex-col gap-2">
-                    {pickSlots.map((slot) => (
+                    {(pickSlots || []).map((slot) => (
                         <CasterSlot key={slot.seq} slot={slot} charMap={charMap} isCurrent={currentSlot?.seq === slot.seq} isBan={false} />
                     ))}
                 </div>
@@ -261,7 +261,7 @@ export function CompleteSummary({ finalTeams, charMap, navigate }) {
             </h2>
             {finalTeams && (
                 <div className="flex gap-6">
-                    {['player_a', 'player_b'].map((player) => (
+                    {(['player_a', 'player_b'] || []).map((player) => (
                         <div key={player} className="flex-1 rounded-2xl p-6"
                             style={{ background: '#111318', border: '1px solid rgba(255,255,255,0.04)' }}>
                             <p className="text-xs font-bold tracking-[0.2em] uppercase mb-4"

@@ -8,7 +8,7 @@ const TEAM_SIZE = 4;
 export default function TeamBuildingView() {
     const {
         draftSlots, charMap, myRole, freeChars, swapState,
-        sendEvent, submitTeams, wsStatus
+        sendEvent, submitTeams, wsStatus, phase
     } = useDraftStore();
 
     const isPlayer = myRole === 'player_a' || myRole === 'player_b';
@@ -58,6 +58,7 @@ export default function TeamBuildingView() {
     const [pool, setPool] = useState([]);
     const [team1, setTeam1] = useState([]);
     const [team2, setTeam2] = useState([]);
+    const [hasInitialized, setHasInitialized] = useState(false);
 
     // Selection for Free Swap mechanic
     const [selectedForSwap, setSelectedForSwap] = useState(null);
@@ -65,17 +66,48 @@ export default function TeamBuildingView() {
 
     // Sync local state when picks or remote team state changes (e.g. on reconnect)
     useEffect(() => {
-        const remoteT1 = swapState?.[`${myRole}_team1`] || [];
-        const remoteT2 = swapState?.[`${myRole}_team2`] || [];
+        const myLocked = (swapState?.[`${myRole}_team1`] || []).length === TEAM_SIZE;
 
-        // Any character in initialPicks that isn't in T1 or T2 goes to pool
-        const assigned = new Set([...(Array.isArray(remoteT1) ? remoteT1 : []), ...(Array.isArray(remoteT2) ? remoteT2 : [])]);
-        const initialPool = (initialPicks || []).filter(id => id && !assigned.has(id));
+        // Reset check: if initialPicks is empty and we were previously initialized, clear everything.
+        // This handles Admin Reset without requiring a full remount (though key prop is also added).
+        if (hasInitialized && (initialPicks || []).length === 0) {
+            setPool([]);
+            setTeam1([]);
+            setTeam2([]);
+            setHasInitialized(false);
+            return;
+        }
 
-        setPool(initialPool);
-        setTeam1(Array.isArray(remoteT1) ? remoteT1 : []);
-        setTeam2(Array.isArray(remoteT2) ? remoteT2 : []);
-    }, [initialPicks, myRole, swapState]);
+        // Strict Reset Guard: if the phase is NOT team_building, we must not have local state.
+        if (phase !== 'team_building' && phase !== 'complete') {
+            if (pool.length > 0 || team1.length > 0 || team2.length > 0) {
+                setPool([]);
+                setTeam1([]);
+                setTeam2([]);
+                setHasInitialized(false);
+            }
+        }
+
+        // We ONLY overwrite local state if:
+        // 1. We haven't initialized yet
+        // 2. We are already locked (this means we are rehydrating from the server's perspective of our final state)
+        if (!hasInitialized || myLocked) {
+            const remoteT1 = swapState?.[`${myRole}_team1`] || [];
+            const remoteT2 = swapState?.[`${myRole}_team2`] || [];
+
+            // Any character in initialPicks that isn't in T1 or T2 goes to pool
+            const assigned = new Set([...(Array.isArray(remoteT1) ? remoteT1 : []), ...(Array.isArray(remoteT2) ? remoteT2 : [])]);
+            const initialPool = (initialPicks || []).filter(id => id && !assigned.has(id));
+
+            setPool(initialPool);
+            setTeam1(Array.isArray(remoteT1) ? remoteT1 : []);
+            setTeam2(Array.isArray(remoteT2) ? remoteT2 : []);
+
+            if (initialPicks.length > 0 || myLocked) {
+                setHasInitialized(true);
+            }
+        }
+    }, [initialPicks, myRole, swapState, hasInitialized]);
 
     // ── Actions ──────────────────────────────────────────────────────────────
 
@@ -131,112 +163,199 @@ export default function TeamBuildingView() {
 
     console.log("Team Building Rendering with:", { pool, team1, team2, charMap: charMap ? Object.keys(charMap).length : 0, wsStatus });
 
+    const opponentRole = myRole === 'player_a' ? 'player_b' : 'player_a';
+    const opponentLocked = (swapState?.[`${opponentRole}_team1`] || []).length === TEAM_SIZE;
+    const bothLocked = isLocked && opponentLocked;
+
     return (
-        <div className="flex flex-col h-full w-full max-w-6xl mx-auto p-4 md:p-8 gap-8">
-            <header className="flex flex-col md:flex-row items-center justify-between gap-4">
-                <div>
-                    <h2 className="text-3xl font-bold tracking-tighter text-white">TEAM BUILDING</h2>
-                    <p className="text-zinc-500 text-sm mt-1">Organize your 8 drafted characters into two teams of 4.</p>
+        <div className="flex flex-col h-full w-full max-w-[1400px] mx-auto p-4 md:p-6 gap-6 overflow-y-auto">
+            <header className="flex flex-col md:flex-row items-center justify-between gap-4 bg-[#0d0e14]/60 backdrop-blur-xl p-6 rounded-3xl border border-white/5 shadow-2xl">
+                <div className="flex items-center gap-4">
+                    <div className="w-12 h-12 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-2xl shadow-[0_0_20px_rgba(99,102,241,0.1)]">
+                        🛠️
+                    </div>
+                    <div>
+                        <h2 className="text-2xl font-bold tracking-tight text-white uppercase italic">Arena Preparation</h2>
+                        <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-[0.2em] mt-1">Both players are finalizing their team compositions</p>
+                    </div>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-4">
                     {!hasActed && (
-                        <>
+                        <div className="flex items-center gap-2 p-1 bg-white/5 rounded-2xl border border-white/5">
                             <button
                                 onClick={handlePass}
-                                className="px-6 py-2 rounded-xl border border-zinc-800 text-zinc-400 hover:bg-zinc-800 hover:text-white transition-all text-xs font-bold uppercase tracking-widest"
+                                className="px-5 py-2 rounded-xl text-zinc-400 hover:bg-white/5 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
                             >
                                 Pass Swap
                             </button>
                             <button
                                 onClick={handleSwap}
                                 disabled={!selectedForSwap || !selectedFree}
-                                className="px-6 py-2 rounded-xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-300 hover:bg-indigo-600 hover:text-white transition-all text-xs font-bold uppercase tracking-widest disabled:opacity-30 disabled:cursor-not-allowed"
+                                className="px-5 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-20 disabled:grayscale"
                             >
                                 Confirm Swap
                             </button>
-                        </>
+                        </div>
                     )}
                     <button
                         onClick={handleLockTeams}
                         disabled={team1.length !== TEAM_SIZE || team2.length !== TEAM_SIZE || isLocked}
-                        className={`px-8 py-3 rounded-xl font-bold uppercase tracking-[0.2em] text-sm transition-all shadow-lg ${isLocked
-                            ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/20 disabled:bg-zinc-800 disabled:text-zinc-600 disabled:shadow-none'
+                        className={`px-8 py-3 rounded-xl font-black uppercase tracking-[0.2em] text-xs transition-all shadow-xl ${isLocked
+                            ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
+                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-500/40 disabled:bg-zinc-800/50 disabled:text-zinc-600 disabled:shadow-none translate-y-[-2px] active:translate-y-[0px]'
                             }`}
                     >
-                        {isLocked ? 'Teams Locked ✓' : 'Lock Team Setup'}
+                        {isLocked ? '✓ Team Ready' : 'Lock Teams'}
                     </button>
                 </div>
             </header>
 
-            <main className="grid grid-cols-1 lg:grid-cols-2 gap-8 flex-1 min-h-0">
-                {/* Left Side: Pool and Free selection */}
+            <main className="grid grid-cols-1 xl:grid-cols-2 gap-8 flex-1">
+                {/* YOUR SIDE */}
                 <div className="flex flex-col gap-6">
-                    <section className="bg-[#0f1117]/50 rounded-3xl p-6 border border-white/5 flex flex-col gap-4">
-                        <div className="flex items-center justify-between">
-                            <h3 className="text-xs font-bold text-zinc-500 uppercase tracking-widest">Drafted Pool</h3>
-                            <span className="text-[10px] text-zinc-600">{pool.length} characters remaining</span>
+                    <div className="flex items-center justify-between px-2">
+                        <div className="flex items-center gap-3">
+                            <span className="w-2 h-2 rounded-full bg-indigo-500 shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Your Configuration</h3>
                         </div>
-                        <div className="grid grid-cols-4 gap-3">
-                            <AnimatePresence mode="popLayout">
-                                {(pool || []).map(id => (
-                                    <CharacterCard
-                                        key={id}
-                                        char={charMap?.[id]}
-                                        onClick={() => moveToTeam(id)}
-                                        isSelected={selectedForSwap === id}
-                                        onSelectForSwap={() => !hasActed && setSelectedForSwap(selectedForSwap === id ? null : id)}
-                                        canSwap={!hasActed}
-                                    />
-                                ))}
-                            </AnimatePresence>
-                            {pool.length === 0 && (
-                                <div className="col-span-4 py-8 flex items-center justify-center border-2 border-dashed border-zinc-800 rounded-2xl">
-                                    <span className="text-zinc-700 text-xs font-medium uppercase tracking-widest italic">Pool Empty</span>
+                        <span className="text-[10px] font-bold text-zinc-600 uppercase tracking-widest">{isLocked ? 'Status: Formed' : 'Pending Selection'}</span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#0d0e14]/40 p-6 rounded-[2rem] border border-white/5">
+                        {/* Pool & Free */}
+                        <div className="flex flex-col gap-6">
+                            <section className="bg-black/20 rounded-2xl p-4 border border-white/5">
+                                <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Drafted Pool</h4>
+                                <div className="grid grid-cols-4 gap-2">
+                                    <AnimatePresence mode="popLayout">
+                                        {(pool || []).map(id => (
+                                            <CharacterCard
+                                                key={id}
+                                                char={charMap?.[id]}
+                                                onClick={() => !isLocked && moveToTeam(id)}
+                                                isSelected={selectedForSwap === id}
+                                                onSelectForSwap={() => !hasActed && setSelectedForSwap(selectedForSwap === id ? null : id)}
+                                                canSwap={!hasActed}
+                                            />
+                                        ))}
+                                    </AnimatePresence>
+                                    {pool.length === 0 && (
+                                        <div className="col-span-4 aspect-video flex items-center justify-center border border-dashed border-zinc-800 rounded-xl">
+                                            <span className="text-[10px] text-zinc-700 uppercase font-black tracking-widest italic">All Assigned</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
+
+                            {!hasActed && (
+                                <section className="bg-indigo-500/5 rounded-2xl p-4 border border-indigo-500/10">
+                                    <h4 className="text-[10px] font-black text-indigo-400/60 uppercase tracking-widest mb-4">Free Characters</h4>
+                                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
+                                        {(freeChars || []).map(char => (
+                                            <FreeCharCard
+                                                key={char?.id}
+                                                char={char}
+                                                isSelected={selectedFree === char?.id}
+                                                onClick={() => setSelectedFree(selectedFree === char?.id ? null : char?.id)}
+                                            />
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
+                        </div>
+
+                        {/* Teams Slots */}
+                        <div className="flex flex-col gap-4">
+                            <TeamSlotSection
+                                label="First Half"
+                                accent="indigo"
+                                characters={team1}
+                                charMap={charMap}
+                                onRemove={(id) => removeFromTeam(id, 1)}
+                                isLocked={isLocked}
+                                dense={true}
+                            />
+                            <TeamSlotSection
+                                label="Second Half"
+                                accent="purple"
+                                characters={team2}
+                                charMap={charMap}
+                                onRemove={(id) => removeFromTeam(id, 2)}
+                                isLocked={isLocked}
+                                dense={true}
+                            />
+                        </div>
+                    </div>
+                </div>
+
+                {/* OPPONENT SIDE */}
+                <div className="flex flex-col gap-6">
+                    <div className="flex items-center justify-between px-2">
+                        <div className="flex items-center gap-3">
+                            <span className={`w-2 h-2 rounded-full ${opponentLocked ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' : 'bg-amber-500/50'}`} />
+                            <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Opponent Side</h3>
+                        </div>
+                        <span className={`text-[10px] font-bold uppercase tracking-widest ${opponentLocked ? 'text-emerald-400' : 'text-amber-500/40 animate-pulse'}`}>
+                            {opponentLocked ? 'Status: Locked' : 'Status: Organizing...'}
+                        </span>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6 bg-[#0d0e14]/40 p-6 rounded-[2rem] border border-white/5 relative">
+                        {/* Left Column: Placeholder/Pool equivalents */}
+                        <div className="flex flex-col gap-6">
+                            {!opponentLocked ? (
+                                <section className="bg-black/20 rounded-2xl p-4 border border-white/5 flex flex-col items-center justify-center min-h-[200px]">
+                                    <div className="w-12 h-12 rounded-full border-2 border-amber-500/10 border-t-amber-500/40 animate-spin mb-4" />
+                                    <p className="text-amber-400/30 text-[9px] font-black uppercase tracking-[0.2em] text-center max-w-[140px]">
+                                        Strategy in Progress...
+                                    </p>
+                                </section>
+                            ) : (
+                                <section className="bg-emerald-500/5 rounded-2xl p-4 border border-emerald-500/10 flex flex-col items-center justify-center min-h-[200px]">
+                                    <span className="text-2xl mb-2 opacity-20">🛡️</span>
+                                    <p className="text-emerald-400/40 text-[9px] font-black uppercase tracking-[0.2em] text-center">
+                                        Configuration Locked
+                                    </p>
+                                </section>
+                            )}
+
+                            {/* Decorative element to maintain symmetry with Free Characters section */}
+                            <div className="hidden md:block h-24 bg-white/[0.02] rounded-2xl border border-white/[0.03] flex items-center justify-center">
+                                <span className="text-[8px] font-black text-white/5 uppercase tracking-[0.4em] italic">Arena Intelligence</span>
+                            </div>
+                        </div>
+
+                        {/* Right Column: Teams Slots */}
+                        <div className="flex flex-col gap-4">
+                            <TeamSlotSection
+                                label="Opponent Team 1"
+                                accent="zinc"
+                                characters={swapState?.[`${opponentRole}_team1`] || []}
+                                charMap={charMap}
+                                isLocked={true}
+                                isFogOfWar={!bothLocked}
+                                dense={true}
+                            />
+                            <TeamSlotSection
+                                label="Opponent Team 2"
+                                accent="zinc"
+                                characters={swapState?.[`${opponentRole}_team2`] || []}
+                                charMap={charMap}
+                                isLocked={true}
+                                isFogOfWar={!bothLocked}
+                                dense={true}
+                            />
+
+                            {!bothLocked && opponentLocked && (
+                                <div className="mt-2 p-3 rounded-xl bg-indigo-500/5 border border-indigo-500/10 text-center">
+                                    <p className="text-indigo-300/40 text-[8px] font-bold uppercase tracking-widest italic leading-relaxed">
+                                        Confirm your teams <br /> to reveal choices
+                                    </p>
                                 </div>
                             )}
                         </div>
-                    </section>
-
-                    {!hasActed && (
-                        <section className="bg-indigo-950/20 rounded-3xl p-6 border border-indigo-500/10 flex flex-col gap-4">
-                            <div className="flex items-center justify-between">
-                                <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest">Season Free Characters</h3>
-                                <span className="text-[10px] text-indigo-600/60 font-medium uppercase tracking-tighter">Swap ONE drafted char</span>
-                            </div>
-                            <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800">
-                                {(freeChars || []).map(char => (
-                                    <FreeCharCard
-                                        key={char?.id}
-                                        char={char}
-                                        isSelected={selectedFree === char?.id}
-                                        onClick={() => setSelectedFree(selectedFree === char?.id ? null : char?.id)}
-                                    />
-                                ))}
-                            </div>
-                        </section>
-                    )}
-                </div>
-
-                {/* Right Side: Teams */}
-                <div className="flex flex-col gap-6">
-                    <TeamSlotSection
-                        label="TEAM 1 — FIRST HALF"
-                        accent="indigo"
-                        characters={team1}
-                        charMap={charMap}
-                        onRemove={(id) => removeFromTeam(id, 1)}
-                        isLocked={isLocked}
-                    />
-                    <TeamSlotSection
-                        label="TEAM 2 — SECOND HALF"
-                        accent="purple"
-                        characters={team2}
-                        charMap={charMap}
-                        onRemove={(id) => removeFromTeam(id, 2)}
-                        isLocked={isLocked}
-                    />
+                    </div>
                 </div>
             </main>
         </div>
@@ -289,7 +408,7 @@ function FreeCharCard({ char, isSelected, onClick }) {
     );
 }
 
-function TeamSlotSection({ label, accent, characters, charMap, onRemove, isLocked }) {
+function TeamSlotSection({ label, accent, characters, charMap, onRemove, isLocked, dense, isFogOfWar }) {
     const slots = Array(TEAM_SIZE).fill(null);
     (characters || []).forEach((id, i) => {
         if (i < TEAM_SIZE) slots[i] = id;
@@ -305,7 +424,7 @@ function TeamSlotSection({ label, accent, characters, charMap, onRemove, isLocke
                 <h3 className={`text-xs font-bold uppercase tracking-widest ${textColor}`}>{label}</h3>
             </div>
 
-            <div className="grid grid-cols-4 gap-4">
+            <div className={`grid grid-cols-4 ${dense ? 'gap-3' : 'gap-4'}`}>
                 {slots.map((charId, idx) => (
                     <div key={idx} className="flex flex-col gap-2">
                         <div
@@ -320,14 +439,22 @@ function TeamSlotSection({ label, accent, characters, charMap, onRemove, isLocke
                             }}
                         >
                             {charId ? (
-                                <img src={charMap?.[charId]?.icon_url} alt="Slot" className="w-full h-full object-cover" />
+                                isFogOfWar ? (
+                                    <div className="w-full h-full bg-gradient-to-br from-zinc-800 to-zinc-900 flex items-center justify-center relative overflow-hidden group">
+                                        <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,rgba(255,255,255,0.05)_0%,transparent_100%)]" />
+                                        <span className="text-3xl opacity-20 filter grayscale">❓</span>
+                                        <div className="absolute inset-x-0 bottom-0 h-1 bg-white/5" />
+                                    </div>
+                                ) : (
+                                    <img src={charMap?.[charId]?.icon_url} alt="Slot" className="w-full h-full object-cover" />
+                                )
                             ) : (
                                 <span className={`text-2xl font-bold opacity-10 ${textColor}`}>0{idx + 1}</span>
                             )}
                         </div>
                         {charId && (
                             <p className="text-[10px] font-bold text-center text-zinc-500 uppercase tracking-tighter truncate">
-                                {charMap?.[charId]?.name}
+                                {isFogOfWar ? '???' : charMap?.[charId]?.name}
                             </p>
                         )}
                     </div>

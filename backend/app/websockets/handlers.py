@@ -677,6 +677,13 @@ async def websocket_endpoint(
                     session.is_paused = False
                     session.player_a_passed = False
                     session.player_b_passed = False
+                    
+                    # Clear Team Building states
+                    session.player_a_team1 = ""
+                    session.player_a_team2 = ""
+                    session.player_b_team1 = ""
+                    session.player_b_team2 = ""
+                    
                     db.commit()
 
                     # Send fresh snapshot to everyone
