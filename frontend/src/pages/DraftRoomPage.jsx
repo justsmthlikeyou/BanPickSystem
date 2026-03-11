@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useCallback } from 'react'
+import React, { useState, useEffect, useMemo, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { draftApi } from '../api/draft'
@@ -158,6 +158,15 @@ export default function DraftRoomPage() {
         sendEvent('SELECT_PREVIEW', { character_id: newSelection })
     }
 
+    // ── Clear Hover on Turn Change ───────────────────────────────────────────
+    useEffect(() => {
+        // Explicitly clear stuck hover images on turn/phase transitions
+        useDraftStore.setState({ hoverPreview: null })
+        if (isPlayer && !isAdmin) {
+            sendEvent('HOVER_PREVIEW', { character_id: null })
+        }
+    }, [curSlot?.seq, phase, isPlayer, isAdmin, sendEvent])
+
     const handleCharHover = useCallback((charId) => {
         if (!isPlayer || activeRole !== curSlot?.acting_player) return
         clearTimeout(hoverTimerRef.current)
@@ -169,13 +178,15 @@ export default function DraftRoomPage() {
 
         hoverTimerRef.current = setTimeout(() => {
             sendEvent('HOVER_PREVIEW', { character_id: charId })
-        }, 80)
+        }, 150)
     }, [isPlayer, activeRole, curSlot?.acting_player, sendEvent, charMap, wsStatus])
 
     const handleCharHoverEnd = useCallback(() => {
         clearTimeout(hoverTimerRef.current)
-        sendEvent('HOVER_PREVIEW', { character_id: null })
-    }, [sendEvent])
+        if (isPlayer && !isAdmin) {
+            sendEvent('HOVER_PREVIEW', { character_id: null })
+        }
+    }, [sendEvent, isPlayer, isAdmin])
 
     const handleAdminPause = () => sendEvent(isPaused ? 'ADMIN_RESUME' : 'ADMIN_PAUSE')
     const handleAdminForceConfirm = () => {
@@ -585,66 +596,76 @@ export default function DraftRoomPage() {
                         </div>
 
                         {/* ── MAIN CONTENT — Role-based layout ───────────── */}
-                        <div className="flex flex-1 overflow-hidden relative">
+                        {/* ── MAIN CONTENT — Role-based layout ───────────── */}
+                        <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden relative pb-32 lg:pb-0">
 
                             {isAdmin ? (
                                 /* ═══════════════════════════════════════════════
                                    CASTER LAYOUT — 25 / 50 / 25
                                    ═══════════════════════════════════════════════ */
                                 <>
-                                    {/* Team A Column (25%) */}
-                                    <CasterTeamColumn
-                                        label="Team A" player="player_a" accentColor="#818cf8" side="left"
-                                        slots={draftSlots} charMap={charMap} currentSlot={curSlot}
-                                    />
-
-                                    {/* Spotlight Center (50%) */}
-                                    <div className="flex-1 h-full relative overflow-hidden flex flex-col">
-                                        {/* Team building / Complete states */}
-                                        {phase === 'team_building' && (
-                                            <TeamBuildingView key={session?.id || 'building'} />
-                                        )}
-
-                                        {phase === 'complete' && (
-                                            <div className="flex-1 flex items-center justify-center overflow-y-auto">
-                                                <CompleteSummary finalTeams={finalTeams} charMap={charMap} navigate={navigate} />
-                                            </div>
-                                        )}
-
-                                        {/* Active Draft — Cinematic Spotlight */}
-                                        {isActiveDraft && (
-                                            <CasterSpotlight
-                                                previewChar={previewChar}
-                                                curSlot={curSlot}
-                                                hoverPreview={hoverPreview}
-                                                lastLockedChar={lastLockedChar}
-                                                selectedCharId={selectedCharId}
-                                                isActiveDraft={isActiveDraft}
-                                                handleAdminForceConfirm={handleAdminForceConfirm}
-                                            />
-                                        )}
-
-                                        {/* Fallback for Admin when waiting but not in active draft/team building/complete */}
-                                        {!isActiveDraft && phase !== 'team_building' && phase !== 'complete' && (
-                                            <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
-                                                <div className="absolute inset-0 z-0">
-                                                    <img src="https://images8.alphacoders.com/135/thumb-1920-1353872.jpeg" alt="arena" className="w-full h-full object-cover opacity-[0.15]" />
-                                                    <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-transparent to-[#08090d]" />
-                                                </div>
-                                                <div className="relative z-10 text-center">
-                                                    <div className="w-16 h-16 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin mx-auto mb-6" />
-                                                    <p className="text-indigo-400 font-bold tracking-[0.3em] uppercase text-sm animate-pulse">Waiting for Players...</p>
-                                                    <p className="text-zinc-600 font-medium text-xs mt-2 uppercase tracking-widest">{phase.replace('_', ' ')}</p>
-                                                </div>
-                                            </div>
-                                        )}
+                                    {/* ── Background & Ambient ── */}
+                                    <div className="absolute inset-0 z-0">
+                                        <img src="https://images3.alphacoders.com/133/thumb-1920-1339893.png" alt="bg" className="w-full h-full object-cover opacity-20 filter blur-sm transition-all duration-1000" />
+                                        <div className="absolute inset-0 bg-gradient-to-tr from-[#050510] via-transparent to-[#050510]/80" />
                                     </div>
 
-                                    {/* Team B Column (25%) */}
-                                    <CasterTeamColumn
-                                        label="Team B" player="player_b" accentColor="#a78bfa" side="right"
-                                        slots={draftSlots} charMap={charMap} currentSlot={curSlot}
-                                    />
+                                    <div className="flex flex-col lg:flex-row flex-1 overflow-y-auto lg:overflow-hidden relative">
+                                        <AnimatePresence mode="wait">
+                                            <CasterTeamColumn
+                                                label="Team A" player="player_a" accentColor="#818cf8" side="left"
+                                                slots={draftSlots} charMap={charMap} currentSlot={curSlot}
+                                            />
+
+                                            {/* Spotlight Center (50%) */}
+                                            <div className="flex-1 h-full relative overflow-hidden flex flex-col">
+                                                {/* Team building / Complete states */}
+                                                {phase === 'team_building' && (
+                                                    <TeamBuildingView key={session?.id || 'building'} />
+                                                )}
+
+                                                {phase === 'complete' && (
+                                                    <div className="flex-1 flex items-center justify-center overflow-y-auto">
+                                                        <CompleteSummary finalTeams={finalTeams} charMap={charMap} navigate={navigate} />
+                                                    </div>
+                                                )}
+
+                                                {/* Active Draft — Cinematic Spotlight */}
+                                                {isActiveDraft && (
+                                                    <CasterSpotlight
+                                                        previewChar={previewChar}
+                                                        curSlot={curSlot}
+                                                        hoverPreview={hoverPreview}
+                                                        lastLockedChar={lastLockedChar}
+                                                        selectedCharId={selectedCharId}
+                                                        isActiveDraft={isActiveDraft}
+                                                        handleAdminForceConfirm={handleAdminForceConfirm}
+                                                    />
+                                                )}
+
+                                                {/* Fallback for Admin when waiting but not in active draft/team building/complete */}
+                                                {!isActiveDraft && phase !== 'team_building' && phase !== 'complete' && (
+                                                    <div className="flex-1 flex flex-col items-center justify-center relative overflow-hidden">
+                                                        <div className="absolute inset-0 z-0">
+                                                            <img src="https://images8.alphacoders.com/135/thumb-1920-1353872.jpeg" alt="arena" className="w-full h-full object-cover opacity-[0.15]" />
+                                                            <div className="absolute inset-0 bg-gradient-to-t from-[#08090d] via-transparent to-[#08090d]" />
+                                                        </div>
+                                                        <div className="relative z-10 text-center">
+                                                            <div className="w-16 h-16 rounded-full border-2 border-indigo-500/30 border-t-indigo-500 animate-spin mx-auto mb-6" />
+                                                            <p className="text-indigo-400 font-bold tracking-[0.3em] uppercase text-sm animate-pulse">Waiting for Players...</p>
+                                                            <p className="text-zinc-600 font-medium text-xs mt-2 uppercase tracking-widest">{phase.replace('_', ' ')}</p>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+
+                                            {/* Team B Column (25%) */}
+                                            <CasterTeamColumn
+                                                label="Team B" player="player_b" accentColor="#a78bfa" side="right"
+                                                slots={draftSlots} charMap={charMap} currentSlot={curSlot}
+                                            />
+                                        </AnimatePresence>
+                                    </div>
                                 </>
                             ) : (
                                 /* ═══════════════════════════════════════════════
@@ -652,7 +673,7 @@ export default function DraftRoomPage() {
                                    ═══════════════════════════════════════════════ */
                                 <>
                                     {/* Left: Draft Content (55% or 100% during team building) */}
-                                    <div className={`${phase === 'team_building' || phase === 'complete' ? 'w-full' : 'w-full lg:w-[55%]'} h-full flex flex-col overflow-hidden box-border`} style={{ padding: phase === 'team_building' ? '0' : '20px 24px' }}>
+                                    <div className={`${phase === 'team_building' || phase === 'complete' ? 'w-full' : 'w-full lg:w-[55%]'} lg:flex-1 lg:h-full flex flex-col overflow-visible lg:overflow-hidden box-border px-2 py-3 lg:px-6 lg:py-5`} style={{ padding: phase === 'team_building' ? '0' : undefined }}>
                                         {phase === 'team_building' && (
                                             <TeamBuildingView key={session?.id || 'building'} />
                                         )}
@@ -676,7 +697,8 @@ export default function DraftRoomPage() {
                                                 </div>
 
                                                 <div className="flex-1 overflow-y-auto h-full rounded-2xl relative box-border scroll-smooth" style={{ background: '#0d0e14', border: '1px solid rgba(255,255,255,0.03)' }}>
-                                                    <div className="grid grid-cols-5 sm:grid-cols-6 md:grid-cols-7 lg:grid-cols-8 xl:grid-cols-9 gap-2 pl-4 pr-6 pt-5 pb-48 box-border">
+                                                    <div className="max-h-[40vh] lg:max-h-none overflow-y-auto scrollbar-thin scrollbar-thumb-zinc-700 scrollbar-track-transparent">
+                                                        <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 xl:grid-cols-9 gap-2 pl-2 pr-4 lg:pl-4 lg:pr-6 pt-5 pb-24 lg:pb-48 box-border">
                                                         {(filteredCharacters || []).map((char) => {
                                                             const isBanned = bannedIds.has(char.id)
                                                             const isPickedA = pickedByA.has(char.id)
@@ -699,7 +721,7 @@ export default function DraftRoomPage() {
                                                                         opacity: isUsed ? 0.35 : isPaused ? 0.6 : 1,
                                                                         filter: isBanned ? 'grayscale(100%)' : 'none',
                                                                     }}>
-                                                                    <div className="w-14 h-14 md:w-16 md:h-16 rounded-lg overflow-hidden mb-1.5" style={{ background: '#191c24' }}>
+                                                                    <div className="w-12 h-12 md:w-16 md:h-16 rounded-lg overflow-hidden mb-1.5" style={{ background: '#191c24' }}>
                                                                         {char.icon_url && <img src={char.icon_url} alt={char.name} className="w-full h-full object-cover" loading="lazy" />}
                                                                     </div>
                                                                     <span className="text-[10px] text-zinc-400 truncate w-full text-center leading-tight">{char.name}</span>
@@ -711,19 +733,20 @@ export default function DraftRoomPage() {
                                                                 </motion.button>
                                                             )
                                                         })}
+                                                        </div>
                                                     </div>
                                                 </div>
                                             </>
                                         )}
                                     </div>
 
-                                    {/* Right: Art Panel (45%) - Hidden during full-screen phases */}
+                                    {/* Right: Art Panel (45%) - Stacked on mobile */}
                                     {phase !== 'team_building' && phase !== 'complete' && (
-                                        <div className="hidden lg:flex lg:w-[45%] h-full max-h-screen flex-col bg-[#050508] border-l border-white/5 overflow-hidden pb-4">
+                                        <div className="flex w-full lg:w-[45%] h-auto lg:h-full max-h-none lg:max-h-screen flex-col bg-[#050508] border-t lg:border-t-0 lg:border-l border-white/5 overflow-y-auto lg:overflow-hidden pb-4 flex-shrink-0">
 
                                             {/* Top: Opponent Team Panel */}
                                             {isActiveDraft && (
-                                                <div className="flex-shrink-0 h-[25%] flex flex-col justify-center p-4 md:p-6 pb-2 border-b border-white/5 bg-[#08090d] z-20">
+                                                <div className="flex-shrink-0 h-auto lg:h-[25%] flex flex-col justify-center p-3 lg:p-6 lg:pb-2 border-b border-white/5 bg-[#08090d] z-20">
                                                     <TeamPanel
                                                         label={activeRole === 'player_a' ? "Team B (Opponent)" : "Team A (Opponent)"}
                                                         player={activeRole === 'player_a' ? 'player_b' : 'player_a'}
@@ -734,30 +757,32 @@ export default function DraftRoomPage() {
                                             )}
 
                                             {/* Middle: Action Zone (Splash Art & Confirm) */}
-                                            <div className="flex-1 min-h-0 relative w-full flex flex-col justify-end p-4 md:p-6 bg-[#08090d] overflow-hidden">
-                                                <AnimatePresence mode="wait">
-                                                    {previewChar?.splash_art_url ? (
-                                                        <motion.div key={`art-${previewChar.id}`}
-                                                            initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 0.8, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
-                                                            transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                                                            className="absolute inset-0"
-                                                        >
-                                                            <img src={previewChar.splash_art_url} alt={previewChar.name} className="absolute inset-0 w-full h-full object-contain object-center opacity-90 z-0 pointer-events-none" />
-                                                        </motion.div>
-                                                    ) : (
-                                                        <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center">
-                                                            <div className="text-center">
-                                                                <span className="text-6xl opacity-10">⚔️</span>
-                                                                <p className="text-zinc-700 text-sm mt-4 tracking-widest uppercase font-bold">Select a character</p>
-                                                            </div>
-                                                        </motion.div>
-                                                    )}
-                                                </AnimatePresence>
+                                            <div className="hidden lg:flex lg:flex-1 h-0 lg:h-full relative w-full flex-col justify-end p-0 lg:p-6 bg-[#08090d] overflow-hidden">
+                                                <div className="absolute inset-0">
+                                                    <AnimatePresence mode="wait">
+                                                        {previewChar?.splash_art_url ? (
+                                                            <motion.div key={`art-${previewChar.id}`}
+                                                                initial={{ opacity: 0, scale: 1.05 }} animate={{ opacity: 0.8, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}
+                                                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                                                                className="absolute inset-0"
+                                                            >
+                                                                <img src={previewChar.splash_art_url} alt={previewChar.name} className="absolute inset-0 w-full h-full object-contain object-center opacity-90 z-0 pointer-events-none" />
+                                                            </motion.div>
+                                                        ) : (
+                                                            <motion.div key="empty" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="absolute inset-0 flex items-center justify-center">
+                                                                <div className="text-center">
+                                                                    <span className="text-6xl opacity-10">⚔️</span>
+                                                                    <p className="text-zinc-700 text-sm mt-4 tracking-widest uppercase font-bold">Select a character</p>
+                                                                </div>
+                                                            </motion.div>
+                                                        )}
+                                                    </AnimatePresence>
 
-                                                {/* Gradient Overlays */}
-                                                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, #08090d 0%, rgba(8,9,13,0.4) 20%, transparent 60%)' }} />
-                                                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, #08090d 0%, transparent 40%)' }} />
-                                                <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(8,9,13,0.4) 0%, transparent 30%)' }} />
+                                                    {/* Gradient Overlays */}
+                                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to right, #08090d 0%, rgba(8,9,13,0.4) 20%, transparent 60%)' }} />
+                                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to top, #08090d 0%, transparent 40%)' }} />
+                                                    <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(to bottom, rgba(8,9,13,0.4) 0%, transparent 30%)' }} />
+                                                </div>
 
                                                 <AnimatePresence>
                                                     {lastLockedChar && (
@@ -772,33 +797,47 @@ export default function DraftRoomPage() {
                                                         {previewChar && (
                                                             <motion.div key={`info-${previewChar.id}`}
                                                                 initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 8 }}
-                                                                transition={{ duration: 0.3 }} className="max-w-sm relative z-10">
-                                                                <h3 className="text-4xl font-bold text-white mb-6" style={{ fontFamily: 'Rajdhani, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>{previewChar.name}</h3>
-                                                                {isPlayer && myTurn && !isPaused && selectedCharId && (
-                                                                    <PrimaryButton onClick={handleConfirm}>
-                                                                        {curSlot?.type === 'ban' ? 'CONFIRM BAN' : 'CONFIRM PICK'}
-                                                                    </PrimaryButton>
-                                                                )}
+                                                                transition={{ duration: 0.3 }} className="max-w-sm relative z-10 w-full">
+                                                                <h3 className="text-2xl lg:text-4xl font-bold text-white mb-2 lg:mb-6 leading-none" style={{ fontFamily: 'Rajdhani, sans-serif', textShadow: '0 2px 10px rgba(0,0,0,0.8)' }}>
+                                                                    {previewChar.name}
+                                                                </h3>
                                                             </motion.div>
                                                         )}
                                                     </AnimatePresence>
 
-                                                    {/* Skip Ban Button */}
-                                                    {isPlayer && myTurn && !isPaused && phase.includes('ban') && (
-                                                        <motion.button
-                                                            initial={{ opacity: 0 }} animate={{ opacity: 1 }}
-                                                            onClick={handleSkipBan}
-                                                            className="w-full max-w-sm mt-3 py-3 font-bold text-zinc-400 bg-transparent border-2 border-zinc-700 rounded-xl hover:bg-zinc-800 hover:text-white transition-all tracking-widest uppercase text-sm"
-                                                        >
-                                                            SKIP BAN
-                                                        </motion.button>
+                                                    {/* Strict Action Button Rendering (Must show if it's player's turn) */}
+                                                    {isPlayer && myTurn && !isPaused && (
+                                                        <div className="hidden lg:block w-full max-w-sm mt-auto relative z-10">
+                                                            <PrimaryButton 
+                                                                onClick={handleConfirm}
+                                                                disabled={!selectedCharId}
+                                                                variant={selectedCharId ? 'primary' : 'ghost'}
+                                                                className="w-full font-bold tracking-[0.2em]"
+                                                            >
+                                                                {!selectedCharId 
+                                                                    ? `SELECT A CHARACTER` 
+                                                                    : `CONFIRM ${curSlot?.type === 'ban' ? 'BAN' : 'PICK'} \u2192`
+                                                                }
+                                                            </PrimaryButton>
+
+                                                            {/* Skip Ban Button */}
+                                                            {phase.includes('ban') && (
+                                                                <motion.button
+                                                                    initial={{ opacity: 0 }} animate={{ opacity: 1 }}
+                                                                    onClick={handleSkipBan}
+                                                                    className="w-full mt-3 py-3 font-bold text-zinc-400 bg-transparent border-2 border-zinc-700 rounded-xl hover:bg-zinc-800 hover:text-white transition-all tracking-widest uppercase text-sm"
+                                                                >
+                                                                    SKIP BAN
+                                                                </motion.button>
+                                                            )}
+                                                        </div>
                                                     )}
                                                 </div>
                                             </div>
 
                                             {/* Bottom: My Team Panel */}
                                             {isActiveDraft && (
-                                                <div className="flex-shrink-0 h-[25%] flex flex-col justify-center p-4 md:p-6 pt-2 border-t border-white/5 bg-[#08090d] z-20 shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
+                                                <div className="flex-shrink-0 h-auto lg:h-[25%] flex flex-col justify-center p-3 pb-24 lg:p-6 lg:pb-6 lg:pt-2 border-t border-white/5 bg-[#08090d] z-20 lg:shadow-[0_-10px_30px_rgba(0,0,0,0.3)]">
                                                     <TeamPanel
                                                         label={activeRole === 'player_a' ? "Team A (You)" : "Team B (You)"}
                                                         player={activeRole === 'player_a' ? 'player_a' : 'player_b'}
@@ -852,18 +891,49 @@ export default function DraftRoomPage() {
                         </div>
 
                         {/* ── MOBILE confirm bar (player only) ── */}
-                        {isPlayer && selectedCharId && myTurn && !isPaused && (
-                            <div className="lg:hidden flex-shrink-0 p-4" style={{ background: '#0d0e14', borderTop: '1px solid rgba(255,255,255,0.04)' }}>
-                                <div className="flex items-center gap-4">
-                                    <div className="w-10 h-10 rounded-xl overflow-hidden flex-shrink-0" style={{ background: '#191c24' }}>
-                                        {charMap[selectedCharId]?.icon_url && <img src={charMap[selectedCharId].icon_url} alt={charMap[selectedCharId].name} className="w-full h-full object-cover" />}
+                        {isPlayer && myTurn && !isPaused && (
+                            <AnimatePresence>
+                                <motion.div 
+                                    initial={{ y: 100, opacity: 0 }} 
+                                    animate={{ y: 0, opacity: 1 }} 
+                                    exit={{ y: 100, opacity: 0 }}
+                                    className="lg:hidden fixed bottom-0 left-0 w-full z-50 p-3 sm:p-4 shadow-[0_-10px_30px_rgba(0,0,0,0.8)] border-t border-white/5" 
+                                    style={{ background: 'rgba(5, 5, 8, 0.95)', backdropFilter: 'blur(10px)' }}
+                                >
+                                    <div className="flex flex-col gap-2 max-w-sm mx-auto">
+                                        <div className="flex items-center gap-3">
+                                            {selectedCharId ? (
+                                            <>
+                                                <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0" style={{ background: '#191c24' }}>
+                                                    {charMap[selectedCharId]?.icon_url && <img src={charMap[selectedCharId].icon_url} alt={charMap[selectedCharId].name} className="w-full h-full object-cover" />}
+                                                </div>
+                                                <span className="font-bold text-white flex-1 truncate">{charMap[selectedCharId]?.name}</span>
+                                            </>
+                                        ) : (
+                                            <span className="font-bold text-zinc-500 flex-1 text-sm tracking-widest uppercase text-center py-2">Select a Character</span>
+                                        )}
+                                        <PrimaryButton 
+                                            onClick={handleConfirm} 
+                                            disabled={!selectedCharId} 
+                                            variant={selectedCharId ? 'primary' : 'ghost'}
+                                            className="w-auto px-6 tracking-wide py-3 flex-shrink-0"
+                                            style={{ minWidth: selectedCharId ? '110px' : '90px' }}
+                                        >
+                                            {!selectedCharId ? 'WAITING' : `${curSlot?.type === 'ban' ? 'BAN' : 'PICK'}`}
+                                        </PrimaryButton>
                                     </div>
-                                    <span className="font-bold text-white flex-1">{charMap[selectedCharId]?.name}</span>
-                                    <PrimaryButton onClick={handleConfirm} disabled={!selectedCharId || !myTurn || isPaused} className="w-auto px-8 tracking-[0.2em] py-2 lg:py-4">
-                                        {curSlot?.type === 'ban' ? 'BAN' : 'PICK'}
-                                    </PrimaryButton>
+                                    {/* Skip Ban Button */}
+                                    {phase.includes('ban') && (
+                                        <button
+                                            onClick={handleSkipBan}
+                                            className="w-full py-2.5 mt-1 font-bold text-zinc-400 bg-transparent border border-zinc-700 rounded-xl hover:bg-zinc-800 hover:text-white transition-all tracking-widest uppercase text-xs"
+                                        >
+                                            SKIP BAN
+                                        </button>
+                                    )}
                                 </div>
-                            </div>
+                            </motion.div>
+                            </AnimatePresence>
                         )}
                     </motion.div>
                 )}
@@ -871,7 +941,6 @@ export default function DraftRoomPage() {
             </AnimatePresence>
 
             {/* ── GLOBAL OVERLAYS (always on top of either layout) ────── */}
-
             {/* Phase transition banner */}
             <AnimatePresence>
                 {phaseTransitionLabel && (
@@ -888,32 +957,7 @@ export default function DraftRoomPage() {
             </AnimatePresence>
 
             {/* Lock-in banner */}
-            <AnimatePresence mode="popLayout">
-                {lastAction && (
-                    <motion.div key={`lock-banner-${lastAction.sequence_num}`}
-                        initial={{ opacity: 0, y: 50, scale: 0.95 }}
-                        animate={{ opacity: 1, y: 0, scale: 1 }}
-                        exit={{ opacity: 0, scale: 0.9 }}
-                        transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                        className="fixed bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center gap-4 rounded-2xl"
-                        style={{
-                            padding: '12px 24px',
-                            background: lastAction.action_type === 'ban' ? 'rgba(239,68,68,0.12)' : 'rgba(99,102,241,0.12)',
-                            border: `1px solid ${lastAction.action_type === 'ban' ? 'rgba(239,68,68,0.25)' : 'rgba(99,102,241,0.25)'}`,
-                            backdropFilter: 'blur(16px)',
-                            boxShadow: `0 8px 32px ${lastAction.action_type === 'ban' ? 'rgba(239,68,68,0.15)' : 'rgba(99,102,241,0.15)'}`
-                        }}>
-                        <div className="w-8 h-8 rounded-lg overflow-hidden" style={{ background: '#191c24' }}>
-                            {charMap[lastAction.character_id]?.icon_url && <img src={charMap[lastAction.character_id].icon_url} alt={charMap[lastAction.character_id].name} className="w-full h-full object-cover" />}
-                        </div>
-                        <span className="text-sm font-bold tracking-wider uppercase" style={{ color: lastAction.action_type === 'ban' ? '#fca5a5' : '#a5b4fc' }}>
-                            {lastAction.acting_player === 'player_a' ? 'Team A' : 'Team B'}
-                            {lastAction.action_type === 'ban' ? ' BANNED ' : ' PICKED '}
-                            {charMap[lastAction.character_id]?.name}
-                        </span>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+            <DraftNotification lastAction={lastAction} charMap={charMap} />
 
             {/* Pause overlay */}
             <AnimatePresence>
@@ -1021,3 +1065,75 @@ function SlotCell({ slot, charMap, isCurrent, isBan }) {
         </div>
     )
 }
+
+/* ═══════════════════════════════════════════════════════════════════════════
+   DraftNotification (Memoized to prevent render loop assassinations)
+   ═══════════════════════════════════════════════════════════════════════════ */
+const DraftNotification = React.memo(({ lastAction, charMap }) => {
+    const [showToast, setShowToast] = useState(false);
+    const [visibleNotification, setVisibleNotification] = useState(null);
+    const lastActionIdRef = useRef(null);
+
+    useEffect(() => {
+        if (!lastAction) return;
+        
+        if (lastActionIdRef.current !== lastAction.sequence_num) {
+            lastActionIdRef.current = lastAction.sequence_num;
+            setVisibleNotification(lastAction);
+            setShowToast(true);
+            
+            const timer = setTimeout(() => {
+                setShowToast(false);
+            }, 3000);
+            
+            return () => clearTimeout(timer);
+        }
+    }, [lastAction]);
+
+    return (
+        <AnimatePresence mode="popLayout">
+            {showToast && visibleNotification && (
+                <motion.div key={`lock-banner-${visibleNotification.sequence_num}`}
+                    initial={{ opacity: 0, y: 50, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.9 }}
+                    transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+                    className="fixed bottom-24 lg:bottom-8 left-1/2 -translate-x-1/2 z-50 flex items-center justify-between gap-3 lg:gap-4 rounded-xl lg:rounded-2xl w-[90%] max-w-md lg:w-auto shadow-2xl overflow-hidden"
+                    style={{
+                        padding: '10px 16px',
+                        background: visibleNotification.action_type === 'ban' ? 'rgba(239,68,68,0.12)' : 'rgba(99,102,241,0.12)',
+                        border: `1px solid ${visibleNotification.action_type === 'ban' ? 'rgba(239,68,68,0.25)' : 'rgba(99,102,241,0.25)'}`,
+                        backdropFilter: 'blur(16px)',
+                    }}
+                >
+                    <div className="flex items-center gap-3 lg:gap-4 flex-1 min-w-0 pr-2">
+                        <div className="w-10 h-10 lg:w-14 lg:h-14 rounded-lg overflow-hidden flex-shrink-0" style={{ background: '#191c24' }}>
+                            {charMap[visibleNotification.character_id]?.icon_url && (
+                                <img src={charMap[visibleNotification.character_id].icon_url} alt="" className="w-full h-full object-cover" />
+                            )}
+                        </div>
+                        <div className="flex flex-col flex-1 min-w-0">
+                            <span className="text-[10px] lg:text-xs font-bold tracking-widest uppercase mb-0.5 lg:mb-1 truncate text-zinc-400">
+                                {visibleNotification.acting_player === 'player_a' ? 'Team A' : 'Team B'} {visibleNotification.action_type}ned
+                            </span>
+                            <span className="text-sm lg:text-lg font-bold text-white leading-none truncate w-full">
+                                {charMap[visibleNotification.character_id]?.name || 'Unknown'}
+                            </span>
+                        </div>
+                    </div>
+                    {/* CRITICAL FALLBACK */}
+                    <button 
+                        onClick={() => setShowToast(false)} 
+                        className="text-white/40 hover:text-white flex-shrink-0 p-2 ml-1 transition-colors z-10"
+                        aria-label="Close Notification"
+                        title="Close"
+                    >
+                        ✕
+                    </button>
+                    {/* Hover fallback clear gradient to avoid text overlapping the close button */}
+                    <div className="absolute right-0 top-0 bottom-0 w-12 pointer-events-none" style={{ background: 'linear-gradient(to right, transparent, rgba(8,9,13,0.3))' }} />
+                </motion.div>
+            )}
+        </AnimatePresence>
+    );
+});
