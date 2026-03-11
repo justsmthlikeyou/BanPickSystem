@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import useDraftStore from '../store/draftStore';
 import { PHASE_LABELS } from '../store/draftStore';
+import seasonFreeCharacterNames from '../config/seasonFreeCharacters.json';
 
 const TEAM_SIZE = 4;
 
@@ -46,7 +47,7 @@ export default function TeamBuildingView() {
 
 
     // ── Local State for interactive sorting ──────────────────────────────────
-    // We derive the initial pool from draftSlots (picks only)
+    // We derive the initial drafted pool from draftSlots (picks only)
     const initialPicks = useMemo(() => {
         if (!isPlayer) return [];
         return (draftSlots || [])
@@ -54,24 +55,35 @@ export default function TeamBuildingView() {
             .map(s => s.character_id);
     }, [draftSlots, myRole, isPlayer]);
 
-    // Track which characters are in which "area"
-    const [pool, setPool] = useState([]);
+    // Track which characters are in which slots
     const [team1, setTeam1] = useState([]);
     const [team2, setTeam2] = useState([]);
     const [hasInitialized, setHasInitialized] = useState(false);
 
-    // Selection for Free Swap mechanic
-    const [selectedForSwap, setSelectedForSwap] = useState(null);
-    const [selectedFree, setSelectedFree] = useState(null);
+    // Dynamic Pools: Calculate what is available based on what is NOT in team1 or team2
+    const assignedIds = new Set([...(team1 || []), ...(team2 || [])]);
+    const draftedPool = (initialPicks || []).filter(id => id && !assignedIds.has(id));
+    
+    // Resolve Season Free Character logical mapping (Names or String IDs -> Actual DB Integer IDs)
+    const seasonFreeIds = useMemo(() => {
+        if (!charMap || !seasonFreeCharacterNames) return [];
+        return seasonFreeCharacterNames.map(identifier => {
+            const char = Object.values(charMap).find(
+                c => c.name === identifier || String(c.id) === String(identifier)
+            );
+            return char ? char.id : null;
+        }).filter(Boolean); // removes any nulls if char isn't found
+    }, [charMap]);
+
+    // Season Free Pool based on static JSON
+    const seasonFreePool = seasonFreeIds.filter(id => !assignedIds.has(id));
 
     // Sync local state when picks or remote team state changes (e.g. on reconnect)
     useEffect(() => {
         const myLocked = (swapState?.[`${myRole}_team1`] || []).length === TEAM_SIZE;
 
         // Reset check: if initialPicks is empty and we were previously initialized, clear everything.
-        // This handles Admin Reset without requiring a full remount (though key prop is also added).
         if (hasInitialized && (initialPicks || []).length === 0) {
-            setPool([]);
             setTeam1([]);
             setTeam2([]);
             setHasInitialized(false);
@@ -80,8 +92,7 @@ export default function TeamBuildingView() {
 
         // Strict Reset Guard: if the phase is NOT team_building, we must not have local state.
         if (phase !== 'team_building' && phase !== 'complete') {
-            if (pool.length > 0 || team1.length > 0 || team2.length > 0) {
-                setPool([]);
+            if (team1.length > 0 || team2.length > 0) {
                 setTeam1([]);
                 setTeam2([]);
                 setHasInitialized(false);
@@ -95,11 +106,6 @@ export default function TeamBuildingView() {
             const remoteT1 = swapState?.[`${myRole}_team1`] || [];
             const remoteT2 = swapState?.[`${myRole}_team2`] || [];
 
-            // Any character in initialPicks that isn't in T1 or T2 goes to pool
-            const assigned = new Set([...(Array.isArray(remoteT1) ? remoteT1 : []), ...(Array.isArray(remoteT2) ? remoteT2 : [])]);
-            const initialPool = (initialPicks || []).filter(id => id && !assigned.has(id));
-
-            setPool(initialPool);
             setTeam1(Array.isArray(remoteT1) ? remoteT1 : []);
             setTeam2(Array.isArray(remoteT2) ? remoteT2 : []);
 
@@ -107,17 +113,15 @@ export default function TeamBuildingView() {
                 setHasInitialized(true);
             }
         }
-    }, [initialPicks, myRole, swapState, hasInitialized]);
+    }, [initialPicks, myRole, swapState, hasInitialized, phase]);
 
     // ── Actions ──────────────────────────────────────────────────────────────
 
     const moveToTeam = (charId) => {
         if (team1.length < TEAM_SIZE) {
             setTeam1([...team1, charId]);
-            setPool(pool.filter(id => id !== charId));
         } else if (team2.length < TEAM_SIZE) {
             setTeam2([...team2, charId]);
-            setPool(pool.filter(id => id !== charId));
         }
     };
 
@@ -127,25 +131,11 @@ export default function TeamBuildingView() {
         } else {
             setTeam2(team2.filter(id => id !== charId));
         }
-        setPool([...pool, charId]);
-    };
-
-    const handleSwap = () => {
-        if (!selectedForSwap || !selectedFree) return;
-        sendEvent('SUBMIT_FREE_SWAP', {
-            original_char_id: selectedForSwap,
-            free_char_id: selectedFree
-        });
-        setSelectedForSwap(null);
-        setSelectedFree(null);
-    };
-
-    const handlePass = () => {
-        sendEvent('PLAYER_PASS_SWAP');
     };
 
     const handleLockTeams = () => {
         if (team1.length === TEAM_SIZE && team2.length === TEAM_SIZE) {
+            console.log("Mock Locking payload:", { team1, team2 });
             submitTeams(team1, team2);
         }
     };
@@ -161,7 +151,8 @@ export default function TeamBuildingView() {
         );
     }
 
-    console.log("Team Building Rendering with:", { pool, team1, team2, charMap: charMap ? Object.keys(charMap).length : 0, wsStatus });
+    // Temporary explicit boundary log
+    console.log("Team Building Rendering with:", { draftedPool, seasonFreePool, team1, team2, charMapKeys: charMap ? Object.keys(charMap).length : 0, wsStatus });
 
     const opponentRole = myRole === 'player_a' ? 'player_b' : 'player_a';
     const opponentLocked = (swapState?.[`${opponentRole}_team1`] || []).length === TEAM_SIZE;
@@ -181,23 +172,6 @@ export default function TeamBuildingView() {
                 </div>
 
                 <div className="flex items-center gap-4">
-                    {!hasActed && (
-                        <div className="flex items-center gap-2 p-1 bg-white/5 rounded-2xl border border-white/5">
-                            <button
-                                onClick={handlePass}
-                                className="px-5 py-2 rounded-xl text-zinc-400 hover:bg-white/5 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest"
-                            >
-                                Pass Swap
-                            </button>
-                            <button
-                                onClick={handleSwap}
-                                disabled={!selectedForSwap || !selectedFree}
-                                className="px-5 py-2 rounded-xl bg-indigo-500/20 text-indigo-300 hover:bg-indigo-500 hover:text-white transition-all text-[10px] font-black uppercase tracking-widest disabled:opacity-20 disabled:grayscale"
-                            >
-                                Confirm Swap
-                            </button>
-                        </div>
-                    )}
                     <button
                         onClick={handleLockTeams}
                         disabled={team1.length !== TEAM_SIZE || team2.length !== TEAM_SIZE || isLocked}
@@ -229,40 +203,49 @@ export default function TeamBuildingView() {
                                 <h4 className="text-[10px] font-black text-zinc-500 uppercase tracking-widest mb-4">Drafted Pool</h4>
                                 <div className="grid grid-cols-4 gap-2">
                                     <AnimatePresence mode="popLayout">
-                                        {(pool || []).map(id => (
-                                            <CharacterCard
-                                                key={id}
-                                                char={charMap?.[id]}
-                                                onClick={() => !isLocked && moveToTeam(id)}
-                                                isSelected={selectedForSwap === id}
-                                                onSelectForSwap={() => !hasActed && setSelectedForSwap(selectedForSwap === id ? null : id)}
-                                                canSwap={!hasActed}
-                                            />
-                                        ))}
+                                        {(draftedPool || []).map(id => {
+                                            if (!id) return null;
+                                            return (
+                                                <CharacterCard
+                                                    key={`drafted-${id}`}
+                                                    char={charMap?.[id]}
+                                                    onClick={() => !isLocked && moveToTeam(id)}
+                                                    canSwap={false}
+                                                />
+                                            );
+                                        })}
                                     </AnimatePresence>
-                                    {pool.length === 0 && (
+                                    {draftedPool.length === 0 && (
                                         <div className="col-span-4 aspect-video flex items-center justify-center border border-dashed border-zinc-800 rounded-xl">
-                                            <span className="text-[10px] text-zinc-700 uppercase font-black tracking-widest italic">All Assigned</span>
+                                            <span className="text-[10px] text-zinc-700 uppercase font-black tracking-widest italic">All Drafted Assigned</span>
                                         </div>
                                     )}
                                 </div>
                             </section>
 
-                            {!hasActed && (
-                                <section className="bg-indigo-500/5 rounded-2xl p-4 border border-indigo-500/10">
-                                    <h4 className="text-[10px] font-black text-indigo-400/60 uppercase tracking-widest mb-4">Free Characters</h4>
-                                    <div className="flex gap-2 overflow-x-auto pb-2 scrollbar-none">
-                                        {(freeChars || []).map(char => (
-                                            <FreeCharCard
-                                                key={char?.id}
-                                                char={char}
-                                                isSelected={selectedFree === char?.id}
-                                                onClick={() => setSelectedFree(selectedFree === char?.id ? null : char?.id)}
-                                            />
-                                        ))}
-                                    </div>
-                                </section>
-                            )}
+                            <section className="bg-indigo-500/5 rounded-2xl p-4 border border-indigo-500/10">
+                                <h4 className="text-[10px] font-black text-indigo-400/60 uppercase tracking-widest mb-4">Season Free Pool</h4>
+                                <div className="grid grid-cols-4 gap-2">
+                                    <AnimatePresence mode="popLayout">
+                                        {(seasonFreePool || []).map(id => {
+                                            if (!id) return null;
+                                            return (
+                                                <CharacterCard
+                                                    key={`free-${id}`}
+                                                    char={charMap?.[id]}
+                                                    onClick={() => !isLocked && moveToTeam(id)}
+                                                    canSwap={false}
+                                                />
+                                            );
+                                        })}
+                                    </AnimatePresence>
+                                    {(!seasonFreePool || seasonFreePool.length === 0) && (
+                                        <div className="col-span-4 aspect-[3/1] flex items-center justify-center border border-dashed border-indigo-500/20 rounded-xl">
+                                            <span className="text-[10px] text-indigo-400/40 uppercase font-black tracking-widest italic">All Free Assigned</span>
+                                        </div>
+                                    )}
+                                </div>
+                            </section>
                         </div>
 
                         {/* Teams Slots */}
@@ -270,7 +253,7 @@ export default function TeamBuildingView() {
                             <TeamSlotSection
                                 label="First Half"
                                 accent="indigo"
-                                characters={team1}
+                                characters={team1 || []}
                                 charMap={charMap}
                                 onRemove={(id) => removeFromTeam(id, 1)}
                                 isLocked={isLocked}
@@ -279,7 +262,7 @@ export default function TeamBuildingView() {
                             <TeamSlotSection
                                 label="Second Half"
                                 accent="purple"
-                                characters={team2}
+                                characters={team2 || []}
                                 charMap={charMap}
                                 onRemove={(id) => removeFromTeam(id, 2)}
                                 isLocked={isLocked}
@@ -393,18 +376,6 @@ function CharacterCard({ char, onClick, isSelected, onSelectForSwap, canSwap }) 
                 <p className="text-[10px] font-bold text-center text-white truncate drop-shadow-md">{char?.name}</p>
             </div>
         </motion.div>
-    );
-}
-
-function FreeCharCard({ char, isSelected, onClick }) {
-    return (
-        <div
-            onClick={onClick}
-            className={`flex-shrink-0 cursor-pointer w-16 h-16 rounded-xl overflow-hidden border-2 transition-all ${isSelected ? 'border-indigo-400 ring-4 ring-indigo-400/20 animate-pulse' : 'border-zinc-800 grayscale opacity-50 hover:grayscale-0 hover:opacity-100'
-                }`}
-        >
-            <img src={char?.icon_url} alt={char?.name} className="w-full h-full object-cover" />
-        </div>
     );
 }
 
